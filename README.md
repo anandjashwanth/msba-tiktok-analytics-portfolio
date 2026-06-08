@@ -1,4 +1,4 @@
-# Abinand Suresh — TikTok Strategy, Analytics and Data Science Portfolio
+# Jashwanth Anand Shankar — TikTok Strategy, Analytics and Data Science Portfolio
 
 This portfolio is arranged for the following internship applications:
 
@@ -6,12 +6,10 @@ This portfolio is arranged for the following internship applications:
 - Data Analyst Project Intern — TikTok LIVE
 - Business Analytics Project Intern — TikTok Shop
 - Data Analyst Project Intern — TikTok Shop EMEA Data Science
+- AI agent Project Intern
 
 The portfolio is organised around the skills these roles ask for: SQL, Python/R analysis, business diagnosis, experimentation, segmentation, predictive modelling, reporting, operational optimisation, and stakeholder-ready recommendations.
 
-## Recommended submission approach
-
-Do not attach every raw coursework file separately in the application form. Upload this folder structure to GitHub, GitHub Pages, Notion, or a clean portfolio site, then submit links to the strongest project folders.
 
 ## Featured projects for TikTok applications
 
