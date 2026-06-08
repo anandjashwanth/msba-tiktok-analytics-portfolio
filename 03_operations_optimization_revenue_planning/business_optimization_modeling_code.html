@@ -1,0 +1,444 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Business Optimisation Modelling with Pyomo</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.55; margin: 0; background: #f6f8fa; color: #24292f; }
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; background: #fff; }
+h1, h2, h3 { color: #0b1f3a; }
+.meta { background: #eef6ff; border-left: 4px solid #0969da; padding: 12px 16px; margin: 16px 0 24px; }
+.cell { border: 1px solid #d0d7de; border-radius: 8px; margin: 18px 0; overflow: hidden; }
+.cell-header { background: #f6f8fa; padding: 8px 12px; font-size: 13px; color: #57606a; border-bottom: 1px solid #d0d7de; }
+.markdown-cell { padding: 16px 20px; }
+.code-cell pre { margin: 0; overflow-x: auto; }
+.output { background: #fbfbfb; border-top: 1px solid #d0d7de; padding: 12px; overflow-x: auto; }
+.output pre { white-space: pre-wrap; margin: 0; }
+img { max-width: 100%; height: auto; }
+table { border-collapse: collapse; margin: 12px 0; }
+th, td { border: 1px solid #d0d7de; padding: 6px 10px; }
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #E40000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #687822 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00F } /* Name.Function */
+.highlight .nl { color: #767600 } /* Name.Label */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */
+</style>
+</head><body><div class="container"><h1>Business Optimisation Modelling with Pyomo</h1><div class="meta"><strong>Source notebook:</strong> business_optimization_modeling_code.ipynb<br><strong>Generated HTML view:</strong> business_optimization_modeling_code.html<br><strong>Cells:</strong> 2 total, 0 markdown, 2 code, 2 saved outputs<br><strong>Note:</strong> This HTML was generated from saved notebook cells and outputs. The notebook was not re-executed.</div><div class="cell code-cell"><div class="cell-header">Code cell 1</div><div class="highlight"><pre><span></span><span class="c1"># Group 9</span>
+
+<span class="c1"># Imports Relevant Packages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyomo.environ</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Read Excel File &amp; Create Dataframe </span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;Group_Assignment_Dataset.xlsx&#39;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;Data&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Extract Primary Inputs</span>
+<span class="n">fleet</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>                                                 <span class="c1"># Total Fleet Size</span>
+<span class="n">initial_inventory</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>                                     <span class="c1"># Initial Inventory in Week 1</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>                                             <span class="c1"># Unit Cost (£) per Generator</span>
+<span class="n">durations</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>   <span class="c1"># Rental Durations</span>
+
+<span class="c1"># A List to Store Cleaned Data</span>
+<span class="n">cleaned_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Reads Weekly Data Rows (from Weeks 1 - 52)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">62</span><span class="p">):</span> 
+    <span class="n">week</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>   <span class="c1">#Extracts the Total Number of Weeks</span>
+
+    <span class="c1"># Stores All Values in Dictionary</span>
+    <span class="n">cleaned_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Week&#39;</span><span class="p">:</span> <span class="n">week</span><span class="p">,</span> <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                         <span class="s1">&#39;Price_1&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;Demand_1&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;Accept_1&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;Return_1&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+                         <span class="s1">&#39;Price_4&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="s1">&#39;Demand_4&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="s1">&#39;Accept_4&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s1">&#39;Return_4&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+                         <span class="s1">&#39;Price_8&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="s1">&#39;Demand_8&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span> <span class="s1">&#39;Accept_8&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">14</span><span class="p">],</span> <span class="s1">&#39;Return_8&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span>
+                         <span class="s1">&#39;Price_16&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span> <span class="s1">&#39;Demand_16&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span> <span class="s1">&#39;Accept_16&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span> <span class="s1">&#39;Return_16&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">19</span><span class="p">]})</span>
+
+<span class="c1"># Converts List of Dictionaries to Dataframe Indexed by Week</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cleaned_data</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Week&#39;</span><span class="p">)</span>
+
+<span class="c1"># Weeks used in Optimisation (Weeks 1 and 52 excluded)</span>
+<span class="n">weeks</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">51</span><span class="p">]</span>
+
+<span class="n">numofweeks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weeks</span><span class="p">)</span>
+<span class="n">numofdurations</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+
+
+<span class="c1"># Opening Inventory for Each Week</span>
+<span class="n">opening_inventory</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">weeks</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+
+<span class="c1"># Numpy Arrays for Price, Demand, and Actual Rentals</span>
+<span class="n">price_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Price_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span><span class="p">])</span>
+<span class="n">demand_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Demand_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span><span class="p">])</span>
+<span class="n">actual_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Accept_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span><span class="p">])</span>
+
+
+<span class="c1"># Function to Retrieve Accepted Rentals from Previous Weeks</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_actual_acc</span><span class="p">(</span><span class="n">week_lag</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">week_lag</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="n">week_lag</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">week_lag</span><span class="p">,</span> <span class="s1">&#39;Accept_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">duration</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+         <span class="k">return</span> <span class="mi">0</span>
+
+<span class="c1"># Calculates Additional Returns Each Week</span>
+<span class="n">pre_returns</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span><span class="p">:</span>
+    <span class="n">extra_returns</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">:</span>
+        <span class="n">extra_returns</span> <span class="o">=</span> <span class="n">extra_returns</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;Return_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span> <span class="o">-</span> <span class="n">get_actual_acc</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+    <span class="n">pre_returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extra_returns</span><span class="p">)</span>
+
+<span class="c1"># Calculates Bw (Available Inventory Each Week)</span>
+<span class="n">Bw</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">running_returns</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">):</span>
+    <span class="n">running_returns</span> <span class="o">=</span> <span class="n">running_returns</span> <span class="o">+</span> <span class="n">pre_returns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">Bw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">initial_inventory</span> <span class="o">+</span> <span class="n">running_returns</span><span class="p">))</span>
+
+<span class="c1"># Create Model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ConcreteModel</span><span class="p">()</span>
+
+<span class="c1"># Decision Variable</span>
+<span class="n">model</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">),</span> <span class="n">domain</span><span class="o">=</span><span class="n">NonNegativeReals</span><span class="p">)</span>
+
+<span class="c1"># Objective Function</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_objective</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">price_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">))</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">rule</span><span class="o">=</span><span class="n">model_objective</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="n">maximize</span><span class="p">)</span>
+
+<span class="c1"># Demand Constraint (Cannot Accept More Rentals than Demand)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">demand_rule</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">demand_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">cost_demand</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="n">demand_rule</span><span class="p">)</span>
+
+<span class="c1"># Capacity Constraint (Inventory Available Each Week)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cap_rule</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">w</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">+</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">w</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">Bw</span><span class="p">[</span><span class="n">w</span><span class="p">]</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">cost_cap</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="n">cap_rule</span><span class="p">)</span>
+
+<span class="c1"># Print Main Parameters</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total Fleet: </span><span class="si">{</span><span class="n">fleet</span><span class="si">}</span><span class="s1"> generators&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initial Inventory: </span><span class="si">{</span><span class="n">initial_inventory</span><span class="si">}</span><span class="s1"> generators&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unit Cost: £</span><span class="si">{</span><span class="n">unit_cost</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Solve Optimisation Model</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">SolverFactory</span><span class="p">(</span><span class="s1">&#39;glpk&#39;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1">## Revenue</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;REVENUE&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">actual_revenue</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">):</span>
+        <span class="n">actual_revenue</span> <span class="o">=</span> <span class="n">actual_revenue</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">*</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">price_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">actual_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SolverStatus</span><span class="o">.</span><span class="n">ok</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">termination_condition</span> <span class="o">==</span> <span class="n">TerminationCondition</span><span class="o">.</span><span class="n">optimal</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Actual Revenue: £</span><span class="si">{</span><span class="n">actual_revenue</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Optimised Revenue: £</span><span class="si">{</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="p">())</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">## Optimal Inventory Path: Bw derived</span>
+<span class="c1"># I_opt[w] = Bw[w] - Σ x_{t,k} (t &lt; w, t+k &gt; w) : inventory before accpecting</span>
+<span class="n">I_opt</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">initial_inventory</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">w_idx</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weeks</span><span class="p">):</span>
+    <span class="n">lp_out</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">)</span> <span class="k">if</span> <span class="n">weeks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">w</span> <span class="ow">and</span> <span class="n">weeks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">I_opt</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">Bw</span><span class="p">[</span><span class="n">w_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">lp_out</span>
+
+<span class="c1"># Week 52: R_52 = NaN → processing this as 0</span>
+<span class="n">acc_51</span>    <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">weeks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">51</span><span class="p">),</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">))</span>
+<span class="n">I_opt</span><span class="p">[</span><span class="mi">52</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">I_opt</span><span class="p">[</span><span class="mi">51</span><span class="p">]</span> <span class="o">-</span> <span class="n">acc_51</span><span class="p">)</span>
+
+<span class="c1">## Load Factor</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LOAD FACTOR&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">actual_load_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">fleet</span> <span class="o">-</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">),</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span> <span class="o">/</span> <span class="n">fleet</span><span class="p">)</span> 
+<span class="n">optimised_load_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([(</span><span class="n">fleet</span> <span class="o">-</span> <span class="n">I_opt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">fleet</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Actual Load Factor: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">actual_load_factor</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Optimised Load Factor: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">optimised_load_factor</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">## Return on Investment (ROI) </span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RETURN ON INVESTMENT (ROI)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">actual_roi</span> <span class="o">=</span> <span class="n">actual_revenue</span> <span class="o">/</span> <span class="p">(</span><span class="n">fleet</span> <span class="o">*</span> <span class="n">unit_cost</span><span class="p">)</span>
+<span class="n">optimised_roi</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">fleet</span> <span class="o">*</span> <span class="n">unit_cost</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Actual ROI:&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">actual_roi</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Optimised ROI:&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">optimised_roi</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">## Shadow Prices</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SHADOW PRICES&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">initial_revenue</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="p">())</span>
+
+<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">):</span>
+    <span class="n">Bw_new</span> <span class="o">=</span> <span class="n">Bw</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Bw_new</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">Bw_new</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">model_sp</span> <span class="o">=</span> <span class="n">ConcreteModel</span><span class="p">()</span>
+    
+    <span class="n">model_sp</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Var</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">),</span> <span class="n">domain</span><span class="o">=</span><span class="n">NonNegativeReals</span><span class="p">)</span>
+
+    <span class="n">model_sp</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">price_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">model_sp</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">)),</span> <span class="n">sense</span><span class="o">=</span><span class="n">maximize</span><span class="p">)</span>
+
+    <span class="n">model_sp</span><span class="o">.</span><span class="n">cost_demand</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">demand_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span>
+
+    <span class="n">model_sp</span><span class="o">.</span><span class="n">cost_cap</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">),</span> <span class="n">rule</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">+</span> <span class="n">durations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">k</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">Bw_new</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model_sp</span><span class="p">)</span>
+
+    <span class="n">shadow_price</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="n">model_sp</span><span class="o">.</span><span class="n">obj</span><span class="p">())</span> <span class="o">-</span> <span class="n">initial_revenue</span>
+
+    <span class="k">if</span> <span class="n">shadow_price</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Week </span><span class="si">{</span><span class="n">weeks</span><span class="p">[</span><span class="n">w</span><span class="p">]</span><span class="si">}</span><span class="s2"> Shadow Price: £</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">shadow_price</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Supplementary Breakdown by Rental Duration</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;REVENUE BREAKDOWN BY RENTAL DURATION (ACTUAL VS. OPTIMISED)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">durations</span><span class="p">):</span>
+    <span class="n">actual_revenue</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">7</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">price_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">actual_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">))</span>
+    <span class="n">optimal_revenue</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">7</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">price_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">))</span>
+
+    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Duration&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-week&#39;</span><span class="p">,</span> 
+        <span class="s1">&#39;Actual Requests Accepted&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">actual_np</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">))),</span>
+        <span class="s1">&#39;Optimal Requests Accepted&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofweeks</span><span class="p">))),</span>
+        <span class="s1">&#39;Actual Revenue&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;£</span><span class="si">{</span><span class="n">actual_revenue</span><span class="si">:</span><span class="s1">,.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Optimised Revenue&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;£</span><span class="si">{</span><span class="n">optimal_revenue</span><span class="si">:</span><span class="s1">,.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
+
+<span class="n">summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Duration&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+<div class="output"><pre>Total Fleet: 300 generators
+Initial Inventory: 77 generators
+Unit Cost: £3000
+
+
+
+REVENUE
+
+Total Actual Revenue: £4,650,478.70
+Total Optimised Revenue: £5,116,909.00
+
+
+
+LOAD FACTOR
+
+Actual Load Factor: 73.38%
+Optimised Load Factor: 79.12%
+
+
+
+RETURN ON INVESTMENT (ROI)
+
+Actual ROI: 5.17
+Optimised ROI: 5.69
+
+
+
+SHADOW PRICES
+
+Week 24 Shadow Price: £313.6
+Week 25 Shadow Price: £168.7
+Week 26 Shadow Price: £541.1
+Week 27 Shadow Price: £555.8
+Week 28 Shadow Price: £84.0
+Week 29 Shadow Price: £572.6
+Week 30 Shadow Price: £544.6
+Week 31 Shadow Price: £534.8
+Week 32 Shadow Price: £204.4
+Week 36 Shadow Price: £512.4
+Week 37 Shadow Price: £672.7
+Week 38 Shadow Price: £2.8
+Week 39 Shadow Price: £72.8
+Week 40 Shadow Price: £512.4
+
+
+
+REVENUE BREAKDOWN BY RENTAL DURATION (ACTUAL VS. OPTIMISED)
+
+          Actual Requests Accepted  Optimal Requests Accepted Actual Revenue Optimised Revenue
+Duration                                                                                      
+1-week                         452                        464    £247,632.70       £254,395.40
+4-week                         401                        458    £722,968.40       £826,179.20
+8-week                         407                        453  £1,275,618.40     £1,417,192.00
+16-week                        445                        485  £2,404,259.20     £2,619,142.40
+</pre></div></div><div class="cell code-cell"><div class="cell-header">Code cell 2</div><div class="highlight"><pre><span></span><span class="c1"># Inventory Comparison</span>
+<span class="n">acc_actual</span> <span class="o">=</span> <span class="p">{(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Accept_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">}</span>
+<span class="n">total_acc_actual</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">acc_actual</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span>
+
+<span class="c1"># Per-duration LP acceptances and returns</span>
+<span class="n">lp_acc</span> <span class="o">=</span> <span class="p">{(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">weeks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">durations</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)])</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">}</span>
+
+<span class="n">total_acc_lp</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">weeks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">j</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numofdurations</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">weeks</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span>
+
+<span class="n">ret</span> <span class="o">=</span> <span class="p">{(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Return_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">}</span>
+
+<span class="n">total_ret</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Return_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span>
+
+<span class="n">demand_by_dur</span> <span class="o">=</span> <span class="p">{(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Demand_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">}</span>
+
+<span class="n">total_demand</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">demand_by_dur</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span>
+
+<span class="c1"># Build DataFrame</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Act_Op_Inv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="s1">&#39;Inventory&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;LP_Op_Inv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">I_opt</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;LP_Acc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_acc_lp</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Act_Acc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_acc_actual</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Tot_Ret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_ret</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Tot_Dem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">total_demand</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">:</span>
+    <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;LP-Acc-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lp_acc</span><span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+    <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Act-Acc-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="p">[</span><span class="n">acc_actual</span><span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+    <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Ret-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ret</span><span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+    <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Dem-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">demand_by_dur</span><span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)]</span>
+
+<span class="c1"># Column order</span>
+<span class="n">ordered</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Act_Op_Inv&#39;</span><span class="p">,</span> <span class="s1">&#39;LP_Op_Inv&#39;</span><span class="p">,</span> <span class="s1">&#39;LP_Acc&#39;</span><span class="p">,</span> <span class="s1">&#39;Act_Acc&#39;</span><span class="p">,</span> <span class="s1">&#39;Tot_Ret&#39;</span><span class="p">,</span> <span class="s1">&#39;Tot_Dem&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">durations</span><span class="p">:</span>
+    <span class="n">ordered</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;LP-Acc-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Act-Acc-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Ret-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Dem-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">-wk&#39;</span><span class="p">]</span>
+
+<span class="n">inv_comparison</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">))[</span><span class="n">ordered</span><span class="p">]</span>
+<span class="n">inv_comparison</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Week&#39;</span>
+<span class="n">inv_comparison</span> <span class="o">=</span> <span class="n">inv_comparison</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">inv_comparison</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+<div class="output"><pre>      Act_Op_Inv  LP_Op_Inv  LP_Acc  Act_Acc  Tot_Ret  Tot_Dem  LP-Acc-1-wk  Act-Acc-1-wk  Ret-1-wk  Dem-1-wk  LP-Acc-4-wk  Act-Acc-4-wk  Ret-4-wk  Dem-4-wk  LP-Acc-8-wk  Act-Acc-8-wk  Ret-8-wk  Dem-8-wk  LP-Acc-16-wk  Act-Acc-16-wk  Ret-16-wk  Dem-16-wk
+Week                                                                                                                                                                                                                                                          
+1             77       77.0     0.0      0.0      0.0      0.0          0.0           0.0       0.0       0.0          0.0           0.0       0.0       0.0          0.0           0.0       0.0       0.0           0.0            0.0        0.0        0.0
+2            102      102.0    26.0     26.0     25.0     26.0          6.0           6.0       1.0       6.0          4.0           4.0      10.0       4.0         10.0          10.0      10.0      10.0           6.0            6.0        4.0        6.0
+3            101      101.0    35.0     35.0     25.0     35.0         10.0          10.0       6.0      10.0          8.0           8.0       8.0       8.0          8.0           8.0       6.0       8.0           9.0            9.0        5.0        9.0
+4             95       95.0    31.0     31.0     29.0     31.0          8.0           8.0      10.0       8.0          9.0           9.0       9.0       9.0          7.0           7.0       8.0       7.0           7.0            7.0        2.0        7.0
+5             97       97.0    36.0     36.0     33.0     36.0          7.0           7.0       8.0       7.0         10.0          10.0      12.0      10.0          6.0           6.0       7.0       6.0          13.0           13.0        6.0       13.0
+6             91       91.0    34.0     34.0     30.0     34.0         10.0          10.0       7.0      10.0          6.0           6.0       4.0       6.0          6.0           6.0       9.0       6.0          12.0           12.0       10.0       12.0
+7             90       90.0    32.0     30.0     33.0     32.0          6.0           6.0      10.0       6.0         12.0          12.0       8.0      12.0          6.0           4.0      10.0       6.0           8.0            8.0        5.0        8.0
+8             92       90.0    22.0     20.0     32.0     22.0          5.0           5.0       6.0       5.0          5.0           5.0       9.0       5.0          6.0           4.0       7.0       6.0           6.0            6.0       10.0        6.0
+9             98       94.0    41.0     35.0     26.0     41.0          7.0           7.0       5.0       7.0         11.0           6.0      10.0      11.0         12.0          11.0       3.0      12.0          11.0           11.0        8.0       11.0
+10            92       82.0    40.0     33.0     29.0     40.0         10.0          10.0       7.0      10.0          8.0           7.0       6.0       8.0         10.0           6.0      10.0      10.0          12.0           10.0        6.0       12.0
+11            98       81.0    34.0     31.0     39.0     34.0          6.0           6.0      10.0       6.0         13.0          11.0      12.0      13.0          7.0           7.0       8.0       7.0           8.0            7.0        9.0        8.0
+12            97       77.0    39.0     35.0     30.0     39.0          8.0           8.0       6.0       8.0         10.0           8.0       5.0      10.0         10.0          10.0       7.0      10.0          11.0            9.0       12.0       11.0
+13            92       73.0    24.0     24.0     30.0     24.0          6.0           6.0       8.0       6.0          5.0           5.0       6.0       5.0          6.0           6.0       6.0       6.0           7.0            7.0       10.0        7.0
+14            96       78.0    45.0     42.0     28.0     45.0         12.0          10.0       6.0      12.0         10.0          10.0       7.0      10.0         10.0           9.0       6.0      10.0          13.0           13.0        9.0       13.0
+15            87       72.0    28.0     28.0     33.0     28.0          6.0           6.0      10.0       6.0          5.0           5.0      11.0       5.0          6.0           6.0       4.0       6.0          11.0           11.0        8.0       11.0
+16            87       76.0    32.0     32.0     28.0     32.0          9.0           9.0       6.0       9.0          6.0           6.0       8.0       6.0          8.0           8.0       4.0       8.0           9.0            9.0       10.0        9.0
+17            89       79.0    53.0     49.0     34.0     53.0         16.0          16.0       9.0      16.0         10.0          10.0       5.0      10.0         12.0          10.0      11.0      12.0          15.0           13.0        9.0       15.0
+18            78       68.0    35.0     34.0     38.0     35.0          7.0           7.0      16.0       7.0          9.0           9.0      10.0       9.0         10.0          10.0       6.0      10.0           9.0            8.0        6.0        9.0
+19            72       61.0    44.0     40.0     28.0     44.0         11.0          11.0       7.0      11.0         13.0          11.0       5.0      13.0         10.0          10.0       7.0      10.0          10.0            8.0        9.0       10.0
+20            66       51.0    36.0     34.0     34.0     36.0          9.0           9.0      11.0       9.0         10.0           9.0       6.0      10.0         10.0          10.0      10.0      10.0           7.0            6.0        7.0        7.0
+21            70       53.0    37.0     32.0     38.0     37.0         12.0          10.0       9.0      12.0         13.0          11.0      10.0      13.0          5.0           5.0       6.0       5.0           7.0            6.0       13.0        7.0
+22            78       59.0    42.0     28.0     40.0     42.0         14.0           2.0      10.0      14.0          7.0           7.0       9.0       7.0         10.0           8.0       9.0      10.0          11.0           11.0       12.0       11.0
+23            77       58.0    50.0     45.0     27.0     50.0         15.0          15.0       2.0      15.0         12.0          12.0      11.0      12.0         13.0           8.0       6.0      13.0          10.0           10.0        8.0       10.0
+24            70       47.0    47.0     51.0     38.0     57.0         18.0          18.0      15.0      18.0         15.0          15.0       9.0      15.0          4.0           8.0       8.0      14.0          10.0           10.0        6.0       10.0
+25            69       54.0    54.0     48.0     50.0     58.0         16.0          16.0      18.0      16.0         14.0           6.0      11.0      14.0         12.0          12.0      10.0      12.0          12.0           14.0       11.0       16.0
+26            64       45.0    45.0     44.0     43.0     49.0          9.0           9.0      16.0      13.0         10.0           9.0       7.0      10.0         14.0          14.0      10.0      14.0          12.0           12.0       10.0       12.0
+27            58       39.0    39.0     41.0     38.0     41.0         11.0          13.0       9.0      13.0          8.0           8.0      12.0       8.0          6.0           6.0      10.0       6.0          14.0           14.0        7.0       14.0
+28            64       47.0    47.0     55.0     47.0     56.0         10.0          10.0      13.0      10.0          8.0          17.0      15.0      17.0         16.0          16.0      10.0      16.0          13.0           12.0        9.0       13.0
+29            37       36.0    36.0     33.0     28.0     46.0          3.0           5.0      10.0       9.0         10.0          10.0       6.0      14.0         13.0          10.0       5.0      13.0          10.0            8.0        7.0       10.0
+30            39       36.0    36.0     39.0     35.0     43.0          4.0          11.0       5.0      11.0         12.0           8.0       9.0      12.0         10.0          10.0       8.0      10.0          10.0           10.0       13.0       10.0
+31            38       36.0    36.0     32.0     38.0     39.0         11.0          14.0      11.0      14.0          9.0           3.0       8.0       9.0          9.0           9.0       8.0       9.0           7.0            6.0       11.0        7.0
+32            54       32.0    32.0     30.0     48.0     32.0         12.0          12.0      14.0      12.0          8.0           8.0      17.0       8.0          6.0           6.0       8.0       6.0           6.0            4.0        9.0        6.0
+33            71       49.0    44.0     44.0     47.0     44.0         14.0          14.0      12.0      14.0          5.0           5.0      10.0       5.0         13.0          13.0      12.0      13.0          12.0           12.0       13.0       12.0
+34            71       54.0    44.0     41.0     44.0     44.0         10.0          10.0      14.0      10.0         12.0          12.0       8.0      12.0         12.0          12.0      14.0      12.0          10.0            7.0        8.0       10.0
+35            57       45.0    44.0     24.0     27.0     46.0         12.0           3.0      10.0      12.0          9.0           3.0       3.0      11.0         13.0          11.0       6.0      13.0          10.0            7.0        8.0       10.0
+36            66       44.0    44.0     24.0     33.0     49.0         12.0           4.0       3.0      12.0         10.0           6.0       8.0      15.0         11.0           3.0      16.0      11.0          11.0           11.0        6.0       11.0
+37            67       37.0    37.0     52.0     25.0     54.0          0.0          15.0       4.0      15.0         10.0          12.0       5.0      12.0         10.0           8.0      10.0      10.0          17.0           17.0        6.0       17.0
+38            63       33.0    33.0     29.0     48.0     33.0         10.0          10.0      15.0      10.0          7.0           4.0      12.0       7.0          5.0           4.0      10.0       5.0          11.0           11.0       11.0       11.0
+39            66       38.0    38.0     32.0     32.0     38.0         12.0          12.0      10.0      12.0          8.0           8.0       3.0       8.0          8.0           2.0       9.0       8.0          10.0           10.0       10.0       10.0
+40            68       38.0    38.0     31.0     34.0     47.0          4.0           8.0      12.0      13.0         10.0           5.0       6.0      10.0         12.0           7.0       6.0      12.0          12.0           11.0       10.0       12.0
+41            84       39.0    28.0     25.0     47.0     28.0         10.0          10.0       8.0      10.0          6.0           3.0      12.0       6.0          6.0           6.0      13.0       6.0           6.0            6.0       14.0        6.0
+42            97       52.0    38.0     27.0     38.0     38.0          9.0           2.0      10.0       9.0          9.0           7.0       4.0       9.0         10.0           8.0      12.0      10.0          10.0           10.0       12.0       10.0
+43           105       58.0    34.0     33.0     35.0     34.0          7.0           7.0       2.0       7.0         10.0          10.0       8.0      10.0         10.0           9.0      11.0      10.0           7.0            7.0       14.0        7.0
+44            99       65.0    34.0     25.0     27.0     34.0          9.0           7.0       7.0       9.0         11.0           9.0       5.0      11.0          6.0           5.0       3.0       6.0           8.0            4.0       12.0        8.0
+45           100       66.0    36.0     32.0     26.0     36.0          9.0           9.0       7.0       9.0         12.0           8.0       3.0      12.0          6.0           6.0       8.0       6.0           9.0            9.0        8.0        9.0
+46            98       63.0    33.0     31.0     30.0     33.0         11.0          11.0       9.0      11.0          8.0           6.0       7.0       8.0          9.0           9.0       4.0       9.0           5.0            5.0       10.0        5.0
+47            96       66.0    33.0     30.0     29.0     33.0          7.0           7.0      11.0       7.0          9.0           6.0      10.0       9.0         11.0          11.0       2.0      11.0           6.0            6.0        6.0        6.0
+48            93       69.0    37.0     37.0     27.0     37.0          8.0           8.0       7.0       8.0         10.0          10.0       9.0      10.0         10.0          10.0       7.0      10.0           9.0            9.0        4.0        9.0
+49            90       70.0    34.0     26.0     34.0     34.0          7.0           4.0       8.0       7.0         10.0          10.0       8.0      10.0          7.0           7.0       6.0       7.0          10.0            5.0       12.0       10.0
+50            89       71.0    32.0     27.0     25.0     32.0          9.0           9.0       4.0       9.0          6.0           6.0       6.0       6.0          9.0           9.0       8.0       9.0           8.0            3.0        7.0        8.0
+51            93       77.0    31.0     28.0     31.0     31.0         10.0          10.0       9.0      10.0          6.0           6.0       6.0       6.0          7.0           7.0       9.0       7.0           8.0            5.0        7.0        8.0
+52            65       46.0     0.0      0.0      0.0      0.0          0.0           0.0       0.0       0.0          0.0           0.0       0.0       0.0          0.0           0.0       0.0       0.0           0.0            0.0        0.0        0.0
+</pre></div></div></div></body></html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MSBA TikTok Analytics Portfolio</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --card: #ffffff;
+      --text: #24292f;
+      --muted: #57606a;
+      --border: #d0d7de;
+      --accent: #0969da;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 34px 24px;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+    }
+    .hero {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    h1 { margin: 0 0 10px; font-size: 32px; }
+    h2 { margin-top: 34px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { margin: 0; }
+    p { color: var(--muted); }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin: 22px 0 8px;
+    }
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .summary-card strong { display: block; margin-bottom: 6px; }
+    .project {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 18px 0 26px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(27,31,36,.04);
+    }
+    .project-header {
+      padding: 18px 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+    .project-header p { margin: 8px 0 0; }
+    .meta {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    iframe {
+      width: 100%;
+      height: 820px;
+      border: 0;
+      background: white;
+      display: block;
+    }
+    .note {
+      background: #fff8c5;
+      border: 1px solid #d4a72c;
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #3b2300;
+      margin: 18px 0;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 18px 0 26px;
+    }
+    .toc ul { margin: 8px 0 0; padding-left: 20px; }
+    footer {
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+      padding-top: 18px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <h1>MSBA TikTok Analytics Portfolio</h1>
+      <p>
+        A curated portfolio of MSBA projects covering SQL business analytics, experimentation,
+        segmentation, optimisation, machine learning, statistical analysis, and AI-enabled analytics.
+        This page embeds the rendered HTML reports directly so reviewers can view the work without
+        opening raw notebook code.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="note">
+      <strong>How to view this correctly:</strong> open this file through GitHub Pages, not through the normal GitHub code viewer.
+      The GitHub Pages URL should look like <code>https://YOUR-USERNAME.github.io/msba-tiktok-analytics-portfolio/</code>.
+    </div>
+
+    <section class="summary">
+      <div class="summary-card"><strong>Strategy & Business Analytics</strong> SQL retail analytics, inventory diagnosis, A/B testing, segmentation, and optimisation.</div>
+      <div class="summary-card"><strong>Data Science & Modelling</strong> Imbalanced classification, model comparison, evaluation metrics, and predictive workflows.</div>
+      <div class="summary-card"><strong>AI/Data Products</strong> RAG, semantic search, Gemini OCR, computer vision, and decision-support workflows.</div>
+      <div class="summary-card"><strong>Communication</strong> Reports and notebook outputs translated into business recommendations.</div>
+    </section>
+
+    <nav class="toc">
+      <strong>Embedded rendered reports on this page</strong>
+      <ul>
+        <li><a href="#popbeauty">PopBeauty SQL Database and Retail Inventory Analysis</a></li>
+        <li><a href="#ab-testing">Loan Policy A/B Testing Report</a></li>
+        <li><a href="#segmentation">Borrower Segmentation Cluster Analysis</a></li>
+        <li><a href="#deep-learning">LendingClub Deep Learning Default Prediction</a></li>
+        <li><a href="#optimization">Business Optimisation Modelling</a></li>
+        <li><a href="#fifa">FIFA Pool Formation Optimisation</a></li>
+        <li><a href="#ml-models">Advanced ML Imbalanced Classification</a></li>
+        <li><a href="#ai-projects">AI/Data Product Projects</a></li>
+        <li><a href="#stats">Statistical and NLP Projects</a></li>
+        <li><a href="#archive">Supporting Archive Projects</a></li>
+      </ul>
+    </nav>
+
+    <h2 id="popbeauty">Retail SQL Business Analytics</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>PopBeauty SQL Database and Retail Inventory Analysis</h3>
+        <p>Relational database design, SQL analytics, retail inventory imbalance diagnosis, and business recommendations.</p>
+        <div class="meta">Folder: 01_retail_sql_business_analytics_popbeauty</div>
+      </div>
+      <iframe src="01_retail_sql_business_analytics_popbeauty/popbeauty_sql_database_analysis.html" title="PopBeauty SQL Database and Retail Inventory Analysis" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="ab-testing">Experimentation and Segmentation</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>Loan Policy A/B Testing Report</h3>
+        <p>A/B testing analysis for evaluating loan review policies and business performance outcomes.</p>
+        <div class="meta">Folder: 02_lendingclub_experimentation_segmentation_prediction</div>
+      </div>
+      <iframe src="02_lendingclub_experimentation_segmentation_prediction/loan_policy_ab_testing_report.html" title="Loan Policy A/B Testing Report" loading="lazy"></iframe>
+    </article>
+
+    <article class="project" id="segmentation">
+      <div class="project-header">
+        <h3>Borrower Segmentation via Cluster Analysis</h3>
+        <p>Cluster analysis for borrower segmentation and policy performance comparison across segments.</p>
+        <div class="meta">Folder: 02_lendingclub_experimentation_segmentation_prediction</div>
+      </div>
+      <iframe src="02_lendingclub_experimentation_segmentation_prediction/borrower_segmentation_cluster_analysis_report.html" title="Borrower Segmentation Cluster Analysis" loading="lazy"></iframe>
+    </article>
+
+    <article class="project" id="deep-learning">
+      <div class="project-header">
+        <h3>LendingClub Deep Learning Default Prediction</h3>
+        <p>Deep learning workflow for default prediction with model evaluation and business interpretation.</p>
+        <div class="meta">Folder: 02_lendingclub_experimentation_segmentation_prediction</div>
+      </div>
+      <iframe src="02_lendingclub_experimentation_segmentation_prediction/lendingclub_deep_learning_default_prediction.html" title="LendingClub Deep Learning Default Prediction" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="optimization">Operations Optimisation and Revenue Planning</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>Business Optimisation Modelling Code</h3>
+        <p>Optimisation modelling for business planning, decision variables, constraints, and objective functions.</p>
+        <div class="meta">Folder: 03_operations_optimization_revenue_planning</div>
+      </div>
+      <iframe src="03_operations_optimization_revenue_planning/business_optimization_modeling_code.html" title="Business Optimisation Modelling Code" loading="lazy"></iframe>
+    </article>
+
+    <article class="project" id="fifa">
+      <div class="project-header">
+        <h3>FIFA Pool Formation Optimisation Notebook</h3>
+        <p>Optimisation and allocation modelling applied to a FIFA pool formation problem.</p>
+        <div class="meta">Folder: 03_operations_optimization_revenue_planning</div>
+      </div>
+      <iframe src="03_operations_optimization_revenue_planning/fifa_pool_formation_optimization_notebook.html" title="FIFA Pool Formation Optimisation Notebook" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="ml-models">Advanced Machine Learning: Imbalanced Classification</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>LightGBM Imbalanced Classification</h3>
+        <p>LightGBM modelling, resampling comparison, and evaluation for imbalanced binary prediction.</p>
+        <div class="meta">Folder: 04_advanced_ml_imbalanced_classification</div>
+      </div>
+      <iframe src="04_advanced_ml_imbalanced_classification/lightgbm_imbalanced_classification.html" title="LightGBM Imbalanced Classification" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Random Forest Imbalanced Classification</h3>
+        <p>Random Forest and balanced modelling workflow with feature selection and threshold evaluation.</p>
+        <div class="meta">Folder: 04_advanced_ml_imbalanced_classification</div>
+      </div>
+      <iframe src="04_advanced_ml_imbalanced_classification/random_forest_imbalanced_classification.html" title="Random Forest Imbalanced Classification" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>LDA Imbalanced Classification</h3>
+        <p>Linear Discriminant Analysis with feature selection and resampling for binary classification.</p>
+        <div class="meta">Folder: 04_advanced_ml_imbalanced_classification</div>
+      </div>
+      <iframe src="04_advanced_ml_imbalanced_classification/lda_imbalanced_classification.html" title="LDA Imbalanced Classification" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="ai-projects">AI/Data Product Projects</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>AI Investment RAG Agent</h3>
+        <p>RAG pipeline, retrieval, prompt engineering, verification, and confidence scoring for investment evaluation.</p>
+        <div class="meta">Folder: 05_ai_data_products_search_and_automation</div>
+      </div>
+      <iframe src="05_ai_data_products_search_and_automation/ai_investment_rag_agent.html" title="AI Investment RAG Agent" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Financial News Semantic Search</h3>
+        <p>Embedding-based semantic search application for retrieving relevant financial news from natural language queries.</p>
+        <div class="meta">Folder: 05_ai_data_products_search_and_automation</div>
+      </div>
+      <iframe src="05_ai_data_products_search_and_automation/financial_news_semantic_search.html" title="Financial News Semantic Search" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Gemini Receipt OCR Evaluation</h3>
+        <p>Gemini Vision OCR workflow for receipt total extraction, prompt design, parsing, and evaluation.</p>
+        <div class="meta">Folder: 05_ai_data_products_search_and_automation</div>
+      </div>
+      <iframe src="05_ai_data_products_search_and_automation/gemini_receipt_ocr_evaluation.html" title="Gemini Receipt OCR Evaluation" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Property Risk Scorecard Computer Vision</h3>
+        <p>Computer vision scoring workflow for property risk classification and underwriting-style decision support.</p>
+        <div class="meta">Folder: 05_ai_data_products_search_and_automation</div>
+      </div>
+      <iframe src="05_ai_data_products_search_and_automation/property_risk_scorecard_computer_vision.html" title="Property Risk Scorecard Computer Vision" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="stats">Statistical and NLP Projects</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>Fake News Sentiment and Topic Modelling</h3>
+        <p>NLP workflow using transformer sentiment analysis and topic modelling for fake news analysis.</p>
+        <div class="meta">Folder: 06_statistical_business_analysis</div>
+      </div>
+      <iframe src="06_statistical_business_analysis/fake_news_sentiment_topic_modeling.html" title="Fake News Sentiment and Topic Modelling" loading="lazy"></iframe>
+    </article>
+
+    <h2 id="archive">Supporting Archive Projects</h2>
+    <article class="project">
+      <div class="project-header">
+        <h3>Credit Card Default Model Comparison</h3>
+        <p>Model comparison workflow for credit card default prediction using classical and advanced tabular models.</p>
+        <div class="meta">Folder: 99_supporting_archive_not_first_choice</div>
+      </div>
+      <iframe src="99_supporting_archive_not_first_choice/credit_card_default_model_comparison.html" title="Credit Card Default Model Comparison" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Loan Default Prediction PyTorch MLP</h3>
+        <p>PyTorch neural network workflow for binary loan default classification.</p>
+        <div class="meta">Folder: 99_supporting_archive_not_first_choice</div>
+      </div>
+      <iframe src="99_supporting_archive_not_first_choice/loan_default_prediction_pytorch_mlp.html" title="Loan Default Prediction PyTorch MLP" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Fashion-MNIST PyTorch MLP</h3>
+        <p>Introductory image classification workflow using PyTorch and Fashion-MNIST.</p>
+        <div class="meta">Folder: 99_supporting_archive_not_first_choice</div>
+      </div>
+      <iframe src="99_supporting_archive_not_first_choice/fashion_mnist_pytorch_mlp.html" title="Fashion-MNIST PyTorch MLP" loading="lazy"></iframe>
+    </article>
+
+    <article class="project">
+      <div class="project-header">
+        <h3>Duplicate Random Forest / Logistic Regression Archive</h3>
+        <p>Archived duplicate notebook retained for completeness; not recommended as a lead project.</p>
+        <div class="meta">Folder: 99_supporting_archive_not_first_choice</div>
+      </div>
+      <iframe src="99_supporting_archive_not_first_choice/duplicate_random_forest_logistic_regression_archive.html" title="Duplicate Random Forest Logistic Regression Archive" loading="lazy"></iframe>
+    </article>
+
+    <footer>
+      <p>
+        This portfolio is designed for GitHub Pages. Normal GitHub repository file view will show HTML source code;
+        GitHub Pages renders the embedded reports as webpages.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>

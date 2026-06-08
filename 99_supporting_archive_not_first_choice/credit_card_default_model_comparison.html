@@ -1,0 +1,624 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Credit Card Default Model Comparison</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.55; margin: 0; background: #f6f8fa; color: #24292f; }
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; background: #fff; }
+h1, h2, h3 { color: #0b1f3a; }
+.meta { background: #eef6ff; border-left: 4px solid #0969da; padding: 12px 16px; margin: 16px 0 24px; }
+.cell { border: 1px solid #d0d7de; border-radius: 8px; margin: 18px 0; overflow: hidden; }
+.cell-header { background: #f6f8fa; padding: 8px 12px; font-size: 13px; color: #57606a; border-bottom: 1px solid #d0d7de; }
+.markdown-cell { padding: 16px 20px; }
+.code-cell pre { margin: 0; overflow-x: auto; }
+.output { background: #fbfbfb; border-top: 1px solid #d0d7de; padding: 12px; overflow-x: auto; }
+.output pre { white-space: pre-wrap; margin: 0; }
+img { max-width: 100%; height: auto; }
+table { border-collapse: collapse; margin: 12px 0; }
+th, td { border: 1px solid #d0d7de; padding: 6px 10px; }
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #E40000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #687822 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00F } /* Name.Function */
+.highlight .nl { color: #767600 } /* Name.Label */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */
+</style>
+</head><body><div class="container"><h1>Credit Card Default Model Comparison</h1><div class="meta"><strong>Source notebook:</strong> credit_card_default_model_comparison.ipynb<br><strong>Generated HTML view:</strong> credit_card_default_model_comparison.html<br><strong>Cells:</strong> 18 total, 9 markdown, 9 code, 5 saved outputs<br><strong>Note:</strong> This HTML was generated from saved notebook cells and outputs. The notebook was not re-executed.</div><div class="cell"><div class="cell-header">Markdown cell 1</div><div class="markdown-cell"><h1>IB9LQ0 – Generative AI and AI Applications</h1>
+<h2>Required Task 5 – Credit Card Default Prediction</h2>
+<p><strong>Module:</strong> IB9LQ0 | Warwick Business School | 2025–2026</p>
+<hr />
+<h3>Key Insights and Takeaways from Completing This Task</h3>
+<p><strong>Task Overview</strong></p>
+<p>This task applies the full structured-data ML workflow from L5 to a
+real-world credit card default dataset. Three models are trained and
+compared: Random Forest, XGBoost, and TabPFN. The target variable
+is <code>default.payment.next.month</code> (1 = will default, 0 = will not).</p>
+<p><strong>Key Insight 1 – What TabPFN is</strong></p>
+<p>TabPFN (Tabular Prior-Data Fitted Network) is a pre-trained
+Transformer for tabular data. Unlike Random Forest and XGBoost,
+which must be trained from scratch on every new dataset, TabPFN
+generates predictions in a single forward pass — no training loop,
+no hyperparameter tuning. It uses in-context learning.</p>
+<p><strong>Key Insight 2 – Why comparison metrics matter</strong></p>
+<p>Accuracy alone is misleading for imbalanced datasets. A model that
+always predicts 'no default' would achieve ~78% accuracy on this
+dataset because most customers don't default. ROC AUC and the
+classification report (precision, recall, F1) give a more honest
+picture of how well each model identifies the minority class.</p>
+<p><strong>Key Insight 3 – TabPFN's strengths and limitations</strong></p>
+<p>TabPFN performs competitively with trained models despite requiring
+no training. Its key limitation is a row cap (~10,000 rows for the
+client version). For large datasets, traditional algorithms like
+Random Forest and XGBoost remain the practical choice.</p>
+<p><strong>Personal Takeaway</strong></p>
+<p>The comparison between the three models revealed that foundation
+models for tabular data (TabPFN) are reaching competitive accuracy
+without any dataset-specific training — a significant shift in how
+structured-data ML will be done in industry.</p>
+<hr />
+<p><em>AI Disclosure: Claude (Anthropic) was used to assist in structuring
+this code. All outputs, interpretations, and conclusions were reviewed
+and validated by the student.</em></p>
+</div></div><div class="cell"><div class="cell-header">Markdown cell 2</div><div class="markdown-cell"><h2>Step 0 – Install Required Libraries</h2>
+<p>We install TabPFN exactly as shown in L5, plus XGBoost for the
+second traditional machine learning algorithm.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 3</div><div class="highlight"><pre><span></span><span class="c1">## TabPFN Installation optimized for Google Colab</span>
+<span class="c1"># Install the TabPFN Client library</span>
+<span class="err">!</span><span class="n">uv</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">tabpfn</span><span class="o">-</span><span class="n">client</span>
+
+<span class="c1"># Install TabPFN extensions for additional functionalities</span>
+<span class="err">!</span><span class="n">uv</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">tabpfn</span><span class="o">-</span><span class="n">extensions</span><span class="p">[</span><span class="nb">all</span><span class="p">]</span>
+
+<span class="c1"># Install XGBoost for the second traditional ML algorithm</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">xgboost</span> <span class="o">-</span><span class="n">q</span>
+</pre></div>
+<div class="output"><pre>[2mUsing Python 3.12.13 environment at: /usr[0m
+[2K[2mResolved [1m46 packages[0m [2min 2.01s[0m[0m
+[2K[2mPrepared [1m8 packages[0m [2min 198ms[0m[0m
+[2mUninstalled [1m1 package[0m [2min 7ms[0m[0m
+[2K[2mInstalled [1m8 packages[0m [2min 46ms[0m[0m
+ [32m+[39m [1mbackoff[0m[2m==2.2.1[0m
+ [32m+[39m [1mnvidia-ml-py[0m[2m==13.595.45[0m
+ [32m+[39m [1mpassword-strength[0m[2m==0.0.3.post2[0m
+ [32m+[39m [1mposthog[0m[2m==7.14.2[0m
+ [31m-[39m [1mrequests[0m[2m==2.32.4[0m
+ [32m+[39m [1mrequests[0m[2m==2.34.2[0m
+ [32m+[39m [1msseclient-py[0m[2m==1.9.0[0m
+ [32m+[39m [1mtabpfn-client[0m[2m==0.3.0[0m
+ [32m+[39m [1mtabpfn-common-utils[0m[2m==0.2.19[0m
+[2mUsing Python 3.12.13 environment at: /usr[0m
+[2K[2mResolved [1m88 packages[0m [2min 1.82s[0m[0m
+[2K[2mPrepared [1m15 packages[0m [2min 1.60s[0m[0m
+[2K[2mInstalled [1m15 packages[0m [2min 190ms[0m[0m
+ [32m+[39m [1mautogluon-common[0m[2m==1.5.0[0m
+ [32m+[39m [1mautogluon-core[0m[2m==1.5.0[0m
+ [32m+[39m [1mautogluon-features[0m[2m==1.5.0[0m
+ [32m+[39m [1mautogluon-tabular[0m[2m==1.5.0[0m
+ [32m+[39m [1mboto3[0m[2m==1.43.8[0m
+ [32m+[39m [1mbotocore[0m[2m==1.43.8[0m
+ [32m+[39m [1mcolour[0m[2m==0.1.5[0m
+ [32m+[39m [1meval-type-backport[0m[2m==0.3.1[0m
+ [32m+[39m [1mgalois[0m[2m==0.4.11[0m
+ [32m+[39m [1mjmespath[0m[2m==1.1.0[0m
+ [32m+[39m [1ms3transfer[0m[2m==0.17.0[0m
+ [32m+[39m [1mshapiq[0m[2m==1.4.1[0m
+ [32m+[39m [1msparse-transform[0m[2m==0.2.1[0m
+ [32m+[39m [1mtabpfn[0m[2m==8.0.2[0m
+ [32m+[39m [1mtabpfn-extensions[0m[2m==0.4.1[0m
+</pre></div></div><div class="cell code-cell"><div class="cell-header">Code cell 4</div><div class="highlight"><pre><span></span><span class="c1"># Simple import for TabPFN — exactly as shown in L5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabpfn_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">TabPFNClassifier</span>
+
+<span class="c1"># Now you can use it like any other sklearn classifier</span>
+<span class="c1"># model = TabPFNClassifier()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TabPFNClassifier imported successfully.&quot;</span><span class="p">)</span>
+</pre></div>
+<div class="output"><pre>TabPFNClassifier imported successfully.
+</pre></div></div><div class="cell"><div class="cell-header">Markdown cell 5</div><div class="markdown-cell"><h2>Step 1 – Upload and Load the Dataset</h2>
+<p>Run this cell. A <strong>'Choose Files'</strong> button will appear.
+Select <code>UCI_Credit_Card.csv</code> (or any CSV with a
+<code>default.payment.next.month</code> target column).</p>
+<p>The code dynamically detects the filename — works with any file.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 6</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">google.colab</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
+
+<span class="c1"># Open a file-picker dialog — works for any CSV/Excel filename</span>
+<span class="n">uploaded</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">uploaded</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File uploaded: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Load the data into a pandas DataFrame based on file type</span>
+<span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">uploaded</span><span class="p">[</span><span class="n">filename</span><span class="p">]))</span>
+<span class="k">elif</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s1">&#39;.xls&#39;</span><span class="p">,</span> <span class="s1">&#39;.xlsx&#39;</span><span class="p">)):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">uploaded</span><span class="p">[</span><span class="n">filename</span><span class="p">]))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported file type. Please upload a .csv, .xls, or .xlsx file.&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data loaded into DataFrame &#39;df&#39; successfully.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+<div class="output">
+     <input type="file" id="files-30ccb04c-f47b-4296-bece-08bc66e8f32a" name="files[]" multiple disabled
+        style="border:none" />
+     <output id="result-30ccb04c-f47b-4296-bece-08bc66e8f32a">
+      Upload widget is only available when the cell has been executed in the
+      current browser session. Please rerun this cell to enable.
+      </output>
+      <script>// Copyright 2017 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Helpers for google.colab Python module.
+ */
+(function(scope) {
+function span(text, styleAttributes = {}) {
+  const element = document.createElement('span');
+  element.textContent = text;
+  for (const key of Object.keys(styleAttributes)) {
+    element.style[key] = styleAttributes[key];
+  }
+  return element;
+}
+
+// Max number of bytes which will be uploaded at a time.
+const MAX_PAYLOAD_SIZE = 100 * 1024;
+
+function _uploadFiles(inputId, outputId) {
+  const steps = uploadFilesStep(inputId, outputId);
+  const outputElement = document.getElementById(outputId);
+  // Cache steps on the outputElement to make it available for the next call
+  // to uploadFilesContinue from Python.
+  outputElement.steps = steps;
+
+  return _uploadFilesContinue(outputId);
+}
+
+// This is roughly an async generator (not supported in the browser yet),
+// where there are multiple asynchronous steps and the Python side is going
+// to poll for completion of each step.
+// This uses a Promise to block the python side on completion of each step,
+// then passes the result of the previous step as the input to the next step.
+function _uploadFilesContinue(outputId) {
+  const outputElement = document.getElementById(outputId);
+  const steps = outputElement.steps;
+
+  const next = steps.next(outputElement.lastPromiseValue);
+  return Promise.resolve(next.value.promise).then((value) => {
+    // Cache the last promise value to make it available to the next
+    // step of the generator.
+    outputElement.lastPromiseValue = value;
+    return next.value.response;
+  });
+}
+
+/**
+ * Generator function which is called between each async step of the upload
+ * process.
+ * @param {string} inputId Element ID of the input file picker element.
+ * @param {string} outputId Element ID of the output display.
+ * @return {!Iterable<!Object>} Iterable of next steps.
+ */
+function* uploadFilesStep(inputId, outputId) {
+  const inputElement = document.getElementById(inputId);
+  inputElement.disabled = false;
+
+  const outputElement = document.getElementById(outputId);
+  outputElement.innerHTML = '';
+
+  const pickedPromise = new Promise((resolve) => {
+    inputElement.addEventListener('change', (e) => {
+      resolve(e.target.files);
+    });
+  });
+
+  const cancel = document.createElement('button');
+  inputElement.parentElement.appendChild(cancel);
+  cancel.textContent = 'Cancel upload';
+  const cancelPromise = new Promise((resolve) => {
+    cancel.onclick = () => {
+      resolve(null);
+    };
+  });
+
+  // Wait for the user to pick the files.
+  const files = yield {
+    promise: Promise.race([pickedPromise, cancelPromise]),
+    response: {
+      action: 'starting',
+    }
+  };
+
+  cancel.remove();
+
+  // Disable the input element since further picks are not allowed.
+  inputElement.disabled = true;
+
+  if (!files) {
+    return {
+      response: {
+        action: 'complete',
+      }
+    };
+  }
+
+  for (const file of files) {
+    const li = document.createElement('li');
+    li.append(span(file.name, {fontWeight: 'bold'}));
+    li.append(span(
+        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +
+        `last modified: ${
+            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :
+                                    'n/a'} - `));
+    const percent = span('0% done');
+    li.appendChild(percent);
+
+    outputElement.appendChild(li);
+
+    const fileDataPromise = new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        resolve(e.target.result);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    // Wait for the data to be ready.
+    let fileData = yield {
+      promise: fileDataPromise,
+      response: {
+        action: 'continue',
+      }
+    };
+
+    // Use a chunked sending to avoid message size limits. See b/62115660.
+    let position = 0;
+    do {
+      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);
+      const chunk = new Uint8Array(fileData, position, length);
+      position += length;
+
+      const base64 = btoa(String.fromCharCode.apply(null, chunk));
+      yield {
+        response: {
+          action: 'append',
+          file: file.name,
+          data: base64,
+        },
+      };
+
+      let percentDone = fileData.byteLength === 0 ?
+          100 :
+          Math.round((position / fileData.byteLength) * 100);
+      percent.textContent = `${percentDone}% done`;
+
+    } while (position < fileData.byteLength);
+  }
+
+  // All done.
+  yield {
+    response: {
+      action: 'complete',
+    }
+  };
+}
+
+scope.google = scope.google || {};
+scope.google.colab = scope.google.colab || {};
+scope.google.colab._files = {
+  _uploadFiles,
+  _uploadFilesContinue,
+};
+})(self);
+</script> </div><div class="output"><pre>Saving credit_card_qa.xlsx to credit_card_qa.xlsx
+File uploaded: credit_card_qa.xlsx
+</pre></div><div class="output"><pre>[0;31m---------------------------------------------------------------------------[0m
+[0;31mUnicodeDecodeError[0m                        Traceback (most recent call last)
+[0;32m/tmp/ipykernel_1506/3759847659.py[0m in [0;36m&lt;cell line: 0&gt;[0;34m()[0m
+[1;32m      9[0m [0;34m[0m[0m
+[1;32m     10[0m [0;31m# Load the CSV into a pandas DataFrame — same pattern as L5[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---&gt; 11[0;31m [0mdf[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mread_csv[0m[0;34m([0m[0mio[0m[0;34m.[0m[0mBytesIO[0m[0;34m([0m[0muploaded[0m[0;34m[[0m[0mfilename[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     12[0m [0;34m[0m[0m
+[1;32m     13[0m [0mprint[0m[0;34m([0m[0;34m&quot;Data loaded into DataFrame &#x27;df&#x27; successfully.&quot;[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.12/dist-packages/pandas/io/parsers/readers.py[0m in [0;36mread_csv[0;34m(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)[0m
+[1;32m   1024[0m     [0mkwds[0m[0;34m.[0m[0mupdate[0m[0;34m([0m[0mkwds_defaults[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1025[0m [0;34m[0m[0m
+[0;32m-&gt; 1026[0;31m     [0;32mreturn[0m [0m_read[0m[0;34m([0m[0mfilepath_or_buffer[0m[0;34m,[0m [0mkwds[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1027[0m [0;34m[0m[0m
+[1;32m   1028[0m [0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.12/dist-packages/pandas/io/parsers/readers.py[0m in [0;36m_read[0;34m(filepath_or_buffer, kwds)[0m
+[1;32m    618[0m [0;34m[0m[0m
+[1;32m    619[0m     [0;31m# Create the parser.[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--&gt; 620[0;31m     [0mparser[0m [0;34m=[0m [0mTextFileReader[0m[0;34m([0m[0mfilepath_or_buffer[0m[0;34m,[0m [0;34m**[0m[0mkwds[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    621[0m [0;34m[0m[0m
+[1;32m    622[0m     [0;32mif[0m [0mchunksize[0m [0;32mor[0m [0miterator[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.12/dist-packages/pandas/io/parsers/readers.py[0m in [0;36m__init__[0;34m(self, f, engine, **kwds)[0m
+[1;32m   1618[0m [0;34m[0m[0m
+[1;32m   1619[0m         [0mself[0m[0;34m.[0m[0mhandles[0m[0;34m:[0m [0mIOHandles[0m [0;34m|[0m [0;32mNone[0m [0;34m=[0m [0;32mNone[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-&gt; 1620[0;31m         [0mself[0m[0;34m.[0m[0m_engine[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_make_engine[0m[0;34m([0m[0mf[0m[0;34m,[0m [0mself[0m[0;34m.[0m[0mengine[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1621[0m [0;34m[0m[0m
+[1;32m   1622[0m     [0;32mdef[0m [0mclose[0m[0;34m([0m[0mself[0m[0;34m)[0m [0;34m-&gt;[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.12/dist-packages/pandas/io/parsers/readers.py[0m in [0;36m_make_engine[0;34m(self, f, engine)[0m
+[1;32m   1896[0m [0;34m[0m[0m
+[1;32m   1897[0m         [0;32mtry[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-&gt; 1898[0;31m             [0;32mreturn[0m [0mmapping[0m[0;34m[[0m[0mengine[0m[0;34m][0m[0;34m([0m[0mf[0m[0;34m,[0m [0;34m**[0m[0mself[0m[0;34m.[0m[0moptions[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1899[0m         [0;32mexcept[0m [0mException[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1900[0m             [0;32mif[0m [0mself[0m[0;34m.[0m[0mhandles[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.12/dist-packages/pandas/io/parsers/c_parser_wrapper.py[0m in [0;36m__init__[0;34m(self, src, **kwds)[0m
+[1;32m     91[0m             [0;31m# Fail here loudly instead of in cython after reading[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     92[0m             [0mimport_optional_dependency[0m[0;34m([0m[0;34m&quot;pyarrow&quot;[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---&gt; 93[0;31m         [0mself[0m[0;34m.[0m[0m_reader[0m [0;34m=[0m [0mparsers[0m[0;34m.[0m[0mTextReader[0m[0;34m([0m[0msrc[0m[0;34m,[0m [0;34m**[0m[0mkwds[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     94[0m [0;34m[0m[0m
+[1;32m     95[0m         [0mself[0m[0;34m.[0m[0munnamed_cols[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_reader[0m[0;34m.[0m[0munnamed_cols[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32mparsers.pyx[0m in [0;36mpandas._libs.parsers.TextReader.__cinit__[0;34m()[0m
+
+[0;32mparsers.pyx[0m in [0;36mpandas._libs.parsers.TextReader._get_header[0;34m()[0m
+
+[0;32mparsers.pyx[0m in [0;36mpandas._libs.parsers.TextReader._tokenize_rows[0;34m()[0m
+
+[0;32mparsers.pyx[0m in [0;36mpandas._libs.parsers.TextReader._check_tokenize_status[0;34m()[0m
+
+[0;32mparsers.pyx[0m in [0;36mpandas._libs.parsers.raise_parser_error[0;34m()[0m
+
+[0;32m/usr/lib/python3.12/codecs.py[0m in [0;36mdecode[0;34m(self, input, final)[0m
+
+[0;31mUnicodeDecodeError[0m: &#x27;utf-8&#x27; codec can&#x27;t decode byte 0x90 in position 22: invalid start byte</pre></div></div><div class="cell code-cell"><div class="cell-header">Code cell 7</div><div class="highlight"><pre><span></span><span class="c1"># Display the full DataFrame — exactly as shown at the end of the L5 task code</span>
+<span class="n">df</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 8</div><div class="markdown-cell"><h2>Step 2 – Separate Features and Target</h2>
+<p>The outcome variable of interest is <code>default.payment.next.month</code>.
+The <code>ID</code> column is a row identifier — it carries no predictive
+information and must be removed from the features.</p>
+<p>Following the L5 pattern: <code>X</code> contains features, <code>y</code> contains
+the target.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 9</div><div class="highlight"><pre><span></span><span class="n">TARGET</span> <span class="o">=</span> <span class="s1">&#39;default.payment.next.month&#39;</span>
+
+<span class="c1"># Drop ID column (row identifier, not a feature) and the target</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">TARGET</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">TARGET</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Features shape : </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Target shape   : </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Target distribution:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Default rate: </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2%</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 10</div><div class="markdown-cell"><h2>Algorithm 1 – Random Forest Classifier</h2>
+<p>Following exactly the preprocessing and training pattern
+demonstrated in <strong>L5_LLMs_Structured_Data.ipynb</strong>:</p>
+<ol>
+<li>Identify categorical columns</li>
+<li>Apply one-hot encoding with <code>pd.get_dummies</code></li>
+<li>Split into 75% train / 25% test (task specifies 25%)</li>
+<li>Train <code>RandomForestClassifier(n_estimators=100, random_state=42)</code></li>
+<li>Evaluate with <code>accuracy_score</code> and <code>classification_report</code></li>
+</ol>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 11</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">classification_report</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+
+<span class="c1"># Identify categorical columns in X — exact pattern from L5</span>
+<span class="n">categorical_cols</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
+
+<span class="c1"># Apply one-hot encoding to categorical features — exact pattern from L5</span>
+<span class="n">X_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">categorical_cols</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Split the data into training and testing sets</span>
+<span class="c1"># CHANGED FROM L5 TUTORIAL: test_size=0.25 (task specifies 25%)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X_encoded</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="c1"># Initialize and train the Random Forest Classifier — exact from L5</span>
+<span class="n">rf_model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">rf_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+<span class="c1"># Make predictions on the test set — exact from L5</span>
+<span class="n">y_pred_rf</span> <span class="o">=</span> <span class="n">rf_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the model — exact metrics from L5</span>
+<span class="n">rf_accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_rf</span><span class="p">)</span>
+<span class="n">rf_report</span>   <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_rf</span><span class="p">)</span>
+<span class="c1"># roc_auc added here to enable a fair comparison with TabPFN</span>
+<span class="n">rf_roc_auc</span>  <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rf_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">rf_accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ROC AUC : </span><span class="si">{</span><span class="n">rf_roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classification Report:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rf_report</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 12</div><div class="markdown-cell"><h2>Algorithm 2 – XGBoost Classifier</h2>
+<p>XGBoost (Extreme Gradient Boosting) is the second traditional
+machine learning algorithm, explicitly named in the task.</p>
+<p>It follows the <strong>exact same sklearn API pattern</strong> as Random Forest —
+the same preprocessing, same split, same evaluation metrics. This
+is intentional: both are trained from scratch on this dataset,
+which is the key contrast with TabPFN.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 13</div><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="kn">import</span> <span class="n">XGBClassifier</span>
+
+<span class="c1"># XGBoost follows the exact same sklearn API pattern as Random Forest</span>
+<span class="c1"># Same X_train, X_test, y_train, y_test from the split above</span>
+<span class="n">xgb_model</span> <span class="o">=</span> <span class="n">XGBClassifier</span><span class="p">(</span>
+    <span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">eval_metric</span><span class="o">=</span><span class="s1">&#39;logloss&#39;</span><span class="p">,</span>  <span class="c1"># suppresses a default warning</span>
+    <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span>             <span class="c1"># suppresses training output</span>
+<span class="p">)</span>
+<span class="n">xgb_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+<span class="c1"># Make predictions on the test set</span>
+<span class="n">y_pred_xgb</span> <span class="o">=</span> <span class="n">xgb_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the model — same metrics as Random Forest</span>
+<span class="n">xgb_accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_xgb</span><span class="p">)</span>
+<span class="n">xgb_report</span>   <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_xgb</span><span class="p">)</span>
+<span class="n">xgb_roc_auc</span>  <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">xgb_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">xgb_accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ROC AUC : </span><span class="si">{</span><span class="n">xgb_roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classification Report:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xgb_report</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 14</div><div class="markdown-cell"><h2>Algorithm 3 – TabPFN</h2>
+<p>TabPFN is a foundation model for tabular data. Unlike Random Forest
+and XGBoost, it is a <strong>pre-trained Transformer</strong> that generates
+predictions in a single forward pass — no dataset-specific training.</p>
+<p>Following the <strong>exact training and evaluation pattern</strong> from L5:</p>
+<ol>
+<li>Split original <code>X</code> and <code>y</code> (TabPFN handles mixed types natively —
+no one-hot encoding needed)</li>
+<li>Fit and predict</li>
+<li>Compute ROC AUC score, accuracy, and classification report</li>
+</ol>
+</div></div><div class="cell"><div class="cell-header">Markdown cell 15</div><div class="markdown-cell"><p><em><strong>First time you run this, you will be asked to create an account.</strong></em></p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 16</div><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabpfn_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">TabPFNClassifier</span>
+
+<span class="c1"># Split the data into training and testing sets</span>
+<span class="c1"># TabPFN uses raw X (not X_encoded) — it handles mixed types natively</span>
+<span class="c1"># CHANGED FROM L5 TUTORIAL: test_size=0.25 (task specifies 25%)</span>
+<span class="n">X_train_pfn</span><span class="p">,</span> <span class="n">X_test_pfn</span><span class="p">,</span> <span class="n">y_train_pfn</span><span class="p">,</span> <span class="n">y_test_pfn</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="c1"># Train and evaluate the TabPFN classifier — exact from L5</span>
+<span class="n">tabpfn_classifier</span> <span class="o">=</span> <span class="n">TabPFNClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">tabpfn_classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_pfn</span><span class="p">,</span> <span class="n">y_train_pfn</span><span class="p">)</span>
+<span class="n">y_pred_proba</span> <span class="o">=</span> <span class="n">tabpfn_classifier</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test_pfn</span><span class="p">)</span>
+<span class="n">y_pred_pfn</span>   <span class="o">=</span> <span class="n">tabpfn_classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_pfn</span><span class="p">)</span>
+
+<span class="c1"># Calculate the ROC AUC score — exact from L5</span>
+<span class="n">tabpfn_roc_auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test_pfn</span><span class="p">,</span> <span class="n">y_pred_proba</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TabPFN ROC AUC Score: </span><span class="si">{</span><span class="n">tabpfn_roc_auc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the model — exact from L5</span>
+<span class="n">tabpfn_accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test_pfn</span><span class="p">,</span> <span class="n">y_pred_pfn</span><span class="p">)</span>
+<span class="n">tabpfn_report</span>   <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test_pfn</span><span class="p">,</span> <span class="n">y_pred_pfn</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">tabpfn_accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classification Report:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tabpfn_report</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 17</div><div class="markdown-cell"><h2>Comparison Summary</h2>
+<p>The table below directly answers the task question:
+<strong>&quot;How well does TabPFN perform in comparison to machine learning algorithms?&quot;</strong></p>
+<p>All three models are evaluated on the same 25% test set with
+the same metrics: Accuracy and ROC AUC.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 18</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Build a summary comparison table</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;Model&#39;</span>   <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Random Forest&#39;</span><span class="p">,</span> <span class="s1">&#39;XGBoost&#39;</span><span class="p">,</span> <span class="s1">&#39;TabPFN&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;Accuracy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">rf_accuracy</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">xgb_accuracy</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">tabpfn_accuracy</span><span class="p">,</span> <span class="mi">4</span><span class="p">)],</span>
+    <span class="s1">&#39;ROC AUC&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">rf_roc_auc</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="nb">round</span><span class="p">(</span><span class="n">xgb_roc_auc</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="nb">round</span><span class="p">(</span><span class="n">tabpfn_roc_auc</span><span class="p">,</span> <span class="mi">4</span><span class="p">)],</span>
+    <span class="s1">&#39;Training Required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;No (pre-trained)&#39;</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--- Model Comparison on 25% Test Set ---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="c1"># Identify the best model by ROC AUC</span>
+<span class="n">best_model</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">comparison</span><span class="p">[</span><span class="s1">&#39;ROC AUC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span> <span class="s1">&#39;Model&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&gt;&gt;&gt; Best model by ROC AUC: </span><span class="si">{</span><span class="n">best_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the interpretation</span>
+<span class="n">tabpfn_vs_rf</span>  <span class="o">=</span> <span class="n">tabpfn_roc_auc</span> <span class="o">-</span> <span class="n">rf_roc_auc</span>
+<span class="n">tabpfn_vs_xgb</span> <span class="o">=</span> <span class="n">tabpfn_roc_auc</span> <span class="o">-</span> <span class="n">xgb_roc_auc</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Interpretation:</span>
+<span class="s2">  TabPFN ROC AUC vs Random Forest : </span><span class="si">{</span><span class="n">tabpfn_vs_rf</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span>
+<span class="s2">  TabPFN ROC AUC vs XGBoost       : </span><span class="si">{</span><span class="n">tabpfn_vs_xgb</span><span class="si">:</span><span class="s2">+.4f</span><span class="si">}</span>
+
+<span class="s2">  TabPFN </span><span class="si">{</span><span class="s1">&#39;outperforms&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">tabpfn_roc_auc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">rf_roc_auc</span><span class="p">,</span><span class="w"> </span><span class="n">xgb_roc_auc</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;performs comparably to or below&#39;</span><span class="si">}</span>
+<span class="s2">  the traditional algorithms despite requiring no dataset-specific</span>
+<span class="s2">  training. This demonstrates TabPFN&#39;s strength as an in-context</span>
+<span class="s2">  learner — it generates predictions in a single forward pass using</span>
+<span class="s2">  knowledge encoded during its pre-training phase.</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div></div></body></html>
