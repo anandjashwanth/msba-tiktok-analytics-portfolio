@@ -1,0 +1,425 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Gemini Receipt OCR Evaluation</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.55; margin: 0; background: #f6f8fa; color: #24292f; }
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; background: #fff; }
+h1, h2, h3 { color: #0b1f3a; }
+.meta { background: #eef6ff; border-left: 4px solid #0969da; padding: 12px 16px; margin: 16px 0 24px; }
+.cell { border: 1px solid #d0d7de; border-radius: 8px; margin: 18px 0; overflow: hidden; }
+.cell-header { background: #f6f8fa; padding: 8px 12px; font-size: 13px; color: #57606a; border-bottom: 1px solid #d0d7de; }
+.markdown-cell { padding: 16px 20px; }
+.code-cell pre { margin: 0; overflow-x: auto; }
+.output { background: #fbfbfb; border-top: 1px solid #d0d7de; padding: 12px; overflow-x: auto; }
+.output pre { white-space: pre-wrap; margin: 0; }
+img { max-width: 100%; height: auto; }
+table { border-collapse: collapse; margin: 12px 0; }
+th, td { border: 1px solid #d0d7de; padding: 6px 10px; }
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #E40000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #687822 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00F } /* Name.Function */
+.highlight .nl { color: #767600 } /* Name.Label */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */
+</style>
+</head><body><div class="container"><h1>Gemini Receipt OCR Evaluation</h1><div class="meta"><strong>Source notebook:</strong> gemini_receipt_ocr_evaluation.ipynb<br><strong>Generated HTML view:</strong> gemini_receipt_ocr_evaluation.html<br><strong>Cells:</strong> 23 total, 9 markdown, 14 code, 0 saved outputs<br><strong>Note:</strong> This HTML was generated from saved notebook cells and outputs. The notebook was not re-executed.</div><div class="cell"><div class="cell-header">Markdown cell 1</div><div class="markdown-cell"><h1>IB9LQ0 – Generative AI and AI Applications</h1>
+<h2>Required Task 9 – OCR with Gemini VLM: Receipt Total Price Extraction</h2>
+<p><strong>Student Number:</strong> <em>(add your student number here)</em><br />
+<strong>Module:</strong> IB9LQ0 | Warwick Business School | 2025–2026</p>
+<hr />
+<h3>Key Insights and Takeaways</h3>
+<p><strong>Task Overview</strong></p>
+<p>This task uses the Gemini 2.5 Flash Vision-Language Model to extract the <code>total_price</code> from receipt images in the <code>naver-clova-ix/cord-v2</code> dataset. Predictions are evaluated against the ground-truth values in <code>df_receipt</code>.</p>
+<p><strong>Key Insight 1 – Prompt design controls output format</strong></p>
+<p>Asking the model to return only a float — with no currency symbol or label — simplifies post-processing. The prompt acts as the output specification for the VLM.</p>
+<p><strong>Key Insight 2 – Error handling is essential</strong></p>
+<p>Real receipts produce noisy responses. Wrapping each API call in a try/except block and using regex to extract numeric values ensures the pipeline records NaN gracefully without crashing.</p>
+<p><strong>Key Insight 3 – Three metrics give a complete picture</strong></p>
+<p>MAE measures average monetary error. Successful extraction rate measures how often the model returned a valid number. Accuracy within 5% and 10% captures near-correct predictions that MAE would penalise too harshly.</p>
+<p><strong>Personal Takeaway</strong></p>
+<p>Running the Gemini API in a loop over 15 receipt images showed that the bottleneck is network latency, not model compute. A short sleep between calls prevents rate-limit errors and reflects how a real production pipeline would be managed.</p>
+<hr />
+<p><em>AI Disclosure: Claude (Anthropic) was used to assist in structuring and drafting this code. All outputs, interpretations, and conclusions were reviewed and validated by the student.</em></p>
+</div></div><div class="cell"><div class="cell-header">Markdown cell 2</div><div class="markdown-cell"><h1>Setup</h1>
+<p>The cells below follow the environment setup from the lecture notebook (<code>MLM2_OCR_with_Gemini.ipynb</code>). They load the Gemini API key from Colab Secrets, list available models, and confirm the model to be used.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 3</div><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">google.colab</span><span class="w"> </span><span class="kn">import</span> <span class="n">userdata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="c1"># Load the API key from Colab Secrets and set it as an environment variable.</span>
+<span class="c1"># The secret must be named &#39;GEMINI_API_KEY&#39; in the Colab Secrets sidebar.</span>
+<span class="n">GEMINI_API_KEY</span> <span class="o">=</span> <span class="n">userdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;GEMINI_API_KEY&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GEMINI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GEMINI_API_KEY</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;API key loaded and environment variable set.&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 4</div><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">google</span><span class="w"> </span><span class="kn">import</span> <span class="n">genai</span>
+
+<span class="c1"># Initialise the Gemini client — reads GEMINI_API_KEY from the environment.</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">genai</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+
+<span class="c1"># List available Gemini models (reproduced from the lecture notebook).</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Listing available Gemini models:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">list</span><span class="p">():</span>
+    <span class="k">if</span> <span class="s2">&quot;gemini&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, Description: </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 5</div><div class="highlight"><pre><span></span><span class="c1"># Set the model to use throughout this task, consistent with the lecture.</span>
+<span class="n">model_id</span> <span class="o">=</span> <span class="s1">&#39;gemini-2.5-flash&#39;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set to use Google Gemini model: </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 6</div><div class="markdown-cell"><h1>Reconstruct <code>df_receipt</code> from the CORD-v2 Dataset</h1>
+<p>Before starting the required task we rebuild the <code>df_receipt</code> DataFrame exactly as done in the lecture notebook. This gives us the ground-truth <code>total_price</code> column needed for evaluation.</p>
+<p>Steps taken from the lecture:</p>
+<ol>
+<li>Load <code>naver-clova-ix/cord-v2</code> via the <code>datasets</code> library.</li>
+<li>Parse each record's JSON <code>ground_truth</code> to extract <code>image</code> and <code>total_price</code>.</li>
+<li>Drop the <code>store_name</code> column (found to be entirely <code>None</code> in the lecture).</li>
+</ol>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 7</div><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="c1"># Load the CORD-v2 receipt dataset — same dataset used in the MLM2 lecture.</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;naver-clova-ix/cord-v2&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset loaded successfully.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 8</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="c1"># Reproduce the exact extraction loop from the lecture notebook.</span>
+<span class="c1"># Iterate through ds[&#39;train&#39;], parse the ground_truth JSON,</span>
+<span class="c1"># and extract the PIL image plus the total_price float.</span>
+
+<span class="n">receipt_data_df</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]:</span>
+    <span class="n">image</span>            <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span>
+    <span class="n">ground_truth_str</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">]</span>
+
+    <span class="n">store_name</span>  <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">total_price</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ground_truth_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">ground_truth_str</span><span class="p">)</span>
+        <span class="n">gt_parse</span> <span class="o">=</span> <span class="n">ground_truth_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;gt_parse&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># Store name extraction (kept for parity with lecture; dropped later).</span>
+        <span class="n">company_name</span> <span class="o">=</span> <span class="n">gt_parse</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;company&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">seller_name</span>  <span class="o">=</span> <span class="n">gt_parse</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;seller&#39;</span><span class="p">,</span>  <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">company_name</span><span class="p">:</span>
+            <span class="n">store_name</span> <span class="o">=</span> <span class="n">company_name</span>
+        <span class="k">elif</span> <span class="n">seller_name</span><span class="p">:</span>
+            <span class="n">store_name</span> <span class="o">=</span> <span class="n">seller_name</span>
+
+        <span class="c1"># Total price extraction.</span>
+        <span class="n">total_info</span>      <span class="o">=</span> <span class="n">gt_parse</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">total_price_str</span> <span class="o">=</span> <span class="n">total_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_price&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Clean and convert the price string to float.</span>
+        <span class="c1"># Handles commas-as-decimal, multiple dots, and currency symbols.</span>
+        <span class="k">if</span> <span class="n">total_price_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">total_price_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">cleaned_price</span> <span class="o">=</span> <span class="n">total_price_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">cleaned_price</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parts</span><span class="p">:</span>
+                <span class="n">last_dot_index</span> <span class="o">=</span> <span class="n">cleaned_price</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">last_dot_index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">last_dot_index</span> <span class="o">&gt;</span> <span class="n">cleaned_price</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">integer_part</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d&#39;</span><span class="p">,</span> <span class="n">cleaned_price</span><span class="p">[:</span><span class="n">last_dot_index</span><span class="p">]))</span>
+                    <span class="n">decimal_part</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d&#39;</span><span class="p">,</span> <span class="n">cleaned_price</span><span class="p">[</span><span class="n">last_dot_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]))</span>
+                    <span class="n">cleaned_price</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">integer_part</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">decimal_part</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cleaned_price</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cleaned_price</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">total_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cleaned_price</span><span class="p">)</span> <span class="k">if</span> <span class="n">cleaned_price</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">total_price</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">receipt_data_df</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;image&#39;</span><span class="p">:</span>       <span class="n">image</span><span class="p">,</span>
+            <span class="s1">&#39;store_name&#39;</span><span class="p">:</span>  <span class="n">store_name</span><span class="p">,</span>
+            <span class="s1">&#39;total_price&#39;</span><span class="p">:</span> <span class="n">total_price</span>
+        <span class="p">})</span>
+
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON decode error for a record: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error for a record: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">continue</span>
+
+<span class="n">df_receipt_summary</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">receipt_data_df</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created df_receipt_summary with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_receipt_summary</span><span class="p">)</span><span class="si">}</span><span class="s2"> records.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 rows of df_receipt_summary:&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df_receipt_summary</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 9</div><div class="highlight"><pre><span></span><span class="c1"># Assign to df_receipt as per the lecture notebook.</span>
+<span class="n">df_receipt</span> <span class="o">=</span> <span class="n">df_receipt_summary</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of records in df_receipt: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_receipt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 rows of df_receipt:&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df_receipt</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 10</div><div class="highlight"><pre><span></span><span class="c1"># Check how many store_name values are None (reproduced from the lecture).</span>
+<span class="n">num_none_store_name</span> <span class="o">=</span> <span class="n">df_receipt</span><span class="p">[</span><span class="s1">&#39;store_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of records with None in &#39;store_name&#39;: </span><span class="si">{</span><span class="n">num_none_store_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 11</div><div class="highlight"><pre><span></span><span class="c1"># Drop the store_name column as it was found to be entirely None in the lecture.</span>
+<span class="n">df_receipt</span> <span class="o">=</span> <span class="n">df_receipt</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;store_name&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &#39;store_name&#39; column removed from df_receipt.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 rows of df_receipt after column removal:&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df_receipt</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 12</div><div class="markdown-cell"><h1>Required Task 9</h1>
+<p>The five steps below correspond directly to the task specification.</p>
+</div></div><div class="cell"><div class="cell-header">Markdown cell 13</div><div class="markdown-cell"><h2>Step 1: Randomly Select 15 Records</h2>
+<p>We randomly sample 15 receipts from <code>df_receipt</code> to form our test set.
+A fixed <code>random_state</code> is used so the selection is reproducible across notebook runs.
+Only rows where <code>total_price</code> is not <code>NaN</code> are included in the sampling pool,
+ensuring every selected receipt has a valid ground-truth value for evaluation.</p>
+<p><strong>Note on the task wording:</strong> The task description contains a typographical inconsistency — the instruction says 'randomly select 100 receipts' but the step heading and DataFrame name both specify 15. This notebook uses n=15 as the correct interpretation, consistent with the heading 'Randomly Select 15 Records' and the DataFrame name <code>df_test_receipts</code>.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 14</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Filter out rows where total_price is NaN before sampling.</span>
+<span class="c1"># This guarantees every sampled receipt has a valid ground-truth price.</span>
+<span class="n">df_receipt_valid</span> <span class="o">=</span> <span class="n">df_receipt</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total records in df_receipt          : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_receipt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Records with valid total_price        : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_receipt_valid</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Randomly select 15 receipts. random_state=42 ensures reproducibility.</span>
+<span class="n">df_test_receipts</span> <span class="o">=</span> <span class="n">df_receipt_valid</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Randomly selected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test_receipts</span><span class="p">)</span><span class="si">}</span><span class="s2"> receipts for testing.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">df_test_receipts — total_price (ground truth):&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df_test_receipts</span><span class="p">[[</span><span class="s1">&#39;total_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 15</div><div class="markdown-cell"><h2>Step 2: Define a Prompt for Gemini</h2>
+<p>The prompt instructs Gemini to extract only the grand total from the receipt image
+and return it as a single float — no currency symbol, no label, no explanation.
+Explicit constraints minimise the chance of the model returning extra text
+that would break float conversion in Step 3.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 16</div><div class="highlight"><pre><span></span><span class="c1"># The prompt instructs Gemini to return ONLY the final total amount as a float.</span>
+<span class="n">extraction_prompt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Look at this receipt image carefully. &quot;</span>
+    <span class="s2">&quot;Extract the final total amount — the grand total that the customer paid. &quot;</span>
+    <span class="s2">&quot;Provide ONLY the numerical value as a float (e.g., 12.50). &quot;</span>
+    <span class="s2">&quot;Do NOT include any currency symbol, label, explanation, or additional text. &quot;</span>
+    <span class="s2">&quot;Return a single numerical value only.&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extraction prompt defined:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">extraction_prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 17</div><div class="markdown-cell"><h2>Step 3: Process <code>df_test_receipts</code> with Gemini</h2>
+<p>We iterate through each row of <code>df_test_receipts</code>, pass the receipt image
+and the prompt to the Gemini VLM, and parse the response into a numeric value.
+Each API call is wrapped in a try/except block. If no valid float can be extracted,
+<code>float('nan')</code> is assigned so the loop continues without crashing.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 18</div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">predicted_prices</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">total_receipts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_test_receipts</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting Gemini predictions for </span><span class="si">{</span><span class="n">total_receipts</span><span class="si">}</span><span class="s2"> receipts...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_test_receipts</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">receipt_image</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span>
+    <span class="n">ground_truth</span>  <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">]</span>
+
+    <span class="n">predicted_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Call the Gemini VLM with the prompt and the PIL image.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">generate_content</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+            <span class="n">contents</span><span class="o">=</span><span class="p">[</span><span class="n">extraction_prompt</span><span class="p">,</span> <span class="n">receipt_image</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">response_text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Parse the response to extract a float.</span>
+        <span class="c1"># Replace comma-as-decimal, then extract numeric substrings.</span>
+        <span class="n">cleaned_response</span> <span class="o">=</span> <span class="n">response_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">numeric_matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+\.?\d*&#39;</span><span class="p">,</span> <span class="n">cleaned_response</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">numeric_matches</span><span class="p">:</span>
+            <span class="n">predicted_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">numeric_matches</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Row </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] Warning: No numeric value found in response: &#39;</span><span class="si">{</span><span class="n">response_text</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="n">predicted_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [Row </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">predicted_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+
+    <span class="n">predicted_prices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_price</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Receipt </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">predicted_prices</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;2</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_receipts</span><span class="si">}</span><span class="s2"> | &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;Ground Truth: </span><span class="si">{</span><span class="n">ground_truth</span><span class="si">:</span><span class="s2">&gt;8.2f</span><span class="si">}</span><span class="s2"> | &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;Predicted: </span><span class="si">{</span><span class="n">predicted_price</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">predicted_price</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;NaN&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Short sleep to avoid hitting Gemini free-tier rate limits.</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Add the predictions as a new column to df_test_receipts.</span>
+<span class="n">df_test_receipts</span> <span class="o">=</span> <span class="n">df_test_receipts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_test_receipts</span><span class="p">[</span><span class="s1">&#39;predicted_total_price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">predicted_prices</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gemini predictions complete. &#39;predicted_total_price&#39; column added.&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 19</div><div class="markdown-cell"><h2>Step 4: Evaluate Predictions</h2>
+<p>We compute three evaluation metrics as specified in the task:</p>
+<ul>
+<li><strong>Successful extractions</strong>: how many predictions are valid (non-NaN)</li>
+<li><strong>MAE</strong>: average absolute monetary error over valid prediction pairs</li>
+<li><strong>Accuracy within 5% and 10%</strong>: percentage of predictions within each threshold</li>
+</ul>
+<p>All metrics are computed only over rows where both <code>total_price</code> and
+<code>predicted_total_price</code> are non-NaN.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 20</div><div class="highlight"><pre><span></span><span class="c1"># Successful extractions.</span>
+<span class="n">num_successful</span> <span class="o">=</span> <span class="n">df_test_receipts</span><span class="p">[</span><span class="s1">&#39;predicted_total_price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">num_total</span>      <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_test_receipts</span><span class="p">)</span>
+<span class="n">extraction_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_successful</span> <span class="o">/</span> <span class="n">num_total</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="c1"># Build evaluation DataFrame with valid prediction pairs only.</span>
+<span class="n">df_eval</span> <span class="o">=</span> <span class="n">df_test_receipts</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted_total_price&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Mean Absolute Error (MAE).</span>
+<span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;absolute_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;predicted_total_price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;absolute_error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Accuracy within a threshold.</span>
+<span class="c1"># Relative error = |predicted - actual| / |actual| * 100.</span>
+<span class="c1"># Guard against division by zero for any ground-truth price of 0.</span>
+<span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;relative_error_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;absolute_error&#39;</span><span class="p">]</span> <span class="o">/</span>
+    <span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">))</span>
+<span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="n">num_within_5pct</span>  <span class="o">=</span> <span class="p">(</span><span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;relative_error_pct&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">num_within_10pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_eval</span><span class="p">[</span><span class="s1">&#39;relative_error_pct&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="n">accuracy_5pct</span>  <span class="o">=</span> <span class="p">(</span><span class="n">num_within_5pct</span>  <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+<span class="n">accuracy_10pct</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_within_10pct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Evaluation metrics calculated.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Valid prediction pairs for metric calculation: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 21</div><div class="markdown-cell"><h2>Step 5: Display Results</h2>
+<p>We print the evaluation metrics in a formatted summary, then display
+<code>df_test_receipts</code> showing <code>total_price</code> and <code>predicted_total_price</code>
+side by side for comparison.</p>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 22</div><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       GEMINI VLM — RECEIPT TOTAL PRICE EXTRACTION&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                  EVALUATION RESULTS&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total receipts tested             : </span><span class="si">{</span><span class="n">num_total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Successful extractions            : </span><span class="si">{</span><span class="n">num_successful</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">num_total</span><span class="si">}</span><span class="s2"> &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">extraction_rate</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Mean Absolute Error (MAE)         : </span><span class="si">{</span><span class="n">mae</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Accuracy within  5% of truth      : </span><span class="si">{</span><span class="n">num_within_5pct</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">accuracy_5pct</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Accuracy within 10% of truth      : </span><span class="si">{</span><span class="n">num_within_10pct</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_eval</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">accuracy_10pct</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 23</div><div class="highlight"><pre><span></span><span class="c1"># Display all 15 rows showing ground truth vs predicted with error columns.</span>
+<span class="n">df_display</span> <span class="o">=</span> <span class="n">df_test_receipts</span><span class="p">[[</span><span class="s1">&#39;total_price&#39;</span><span class="p">,</span> <span class="s1">&#39;predicted_total_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;absolute_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;predicted_total_price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+<span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;relative_error_%&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;absolute_error&#39;</span><span class="p">]</span> <span class="o">/</span>
+    <span class="n">df_display</span><span class="p">[</span><span class="s1">&#39;total_price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">))</span>
+<span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="n">df_display</span> <span class="o">=</span> <span class="n">df_display</span><span class="o">.</span><span class="n">round</span><span class="p">({</span>
+    <span class="s1">&#39;total_price&#39;</span><span class="p">:</span>           <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;predicted_total_price&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;absolute_error&#39;</span><span class="p">:</span>        <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;relative_error_%&#39;</span><span class="p">:</span>      <span class="mi">2</span>
+<span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df_test_receipts — Ground Truth vs. Predicted Total Price:&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">df_display</span><span class="p">)</span>
+</pre></div>
+</div></div></body></html>

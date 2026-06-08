@@ -1,0 +1,798 @@
+<!doctype html><html><head><meta charset="utf-8"><title>FIFA Pool Formation Optimisation Model</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.55; margin: 0; background: #f6f8fa; color: #24292f; }
+.container { max-width: 1100px; margin: 0 auto; padding: 32px; background: #fff; }
+h1, h2, h3 { color: #0b1f3a; }
+.meta { background: #eef6ff; border-left: 4px solid #0969da; padding: 12px 16px; margin: 16px 0 24px; }
+.cell { border: 1px solid #d0d7de; border-radius: 8px; margin: 18px 0; overflow: hidden; }
+.cell-header { background: #f6f8fa; padding: 8px 12px; font-size: 13px; color: #57606a; border-bottom: 1px solid #d0d7de; }
+.markdown-cell { padding: 16px 20px; }
+.code-cell pre { margin: 0; overflow-x: auto; }
+.output { background: #fbfbfb; border-top: 1px solid #d0d7de; padding: 12px; overflow-x: auto; }
+.output pre { white-space: pre-wrap; margin: 0; }
+img { max-width: 100%; height: auto; }
+table { border-collapse: collapse; margin: 12px 0; }
+th, td { border: 1px solid #d0d7de; padding: 6px 10px; }
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #E40000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #687822 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00F } /* Name.Function */
+.highlight .nl { color: #767600 } /* Name.Label */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */
+</style>
+</head><body><div class="container"><h1>FIFA Pool Formation Optimisation Model</h1><div class="meta"><strong>Source notebook:</strong> fifa_pool_formation_optimization_notebook.ipynb<br><strong>Generated HTML view:</strong> fifa_pool_formation_optimization_notebook.html<br><strong>Cells:</strong> 37 total, 16 markdown, 21 code, 5 saved outputs<br><strong>Note:</strong> This HTML was generated from saved notebook cells and outputs. The notebook was not re-executed.</div><div class="cell"><div class="cell-header">Markdown cell 1</div><div class="markdown-cell"><p>Note: please open this file in Jupyter to get the same result as in the report.</p>
+</div></div><div class="cell"><div class="cell-header">Markdown cell 2</div><div class="markdown-cell"><h1>Question 2</h1>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 3</div><div class="highlight"><pre><span></span><span class="c1"># Group Formation Model</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 4</div><div class="highlight"><pre><span></span><span class="c1"># import liabrary</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyomo.environ</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyomo.opt</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolverStatus</span><span class="p">,</span> <span class="n">TerminationCondition</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyomo.environ</span><span class="w"> </span><span class="kn">import</span> <span class="n">value</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 5</div><div class="markdown-cell"><h2>2.1) Load data</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 6</div><div class="highlight"><pre><span></span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;AAMA_Group34_data.xlsx&#39;</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;FIFA2026_qualified_nations&#39;</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">nations</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>             <span class="c1"># to get a list of 48 nations</span>
+<span class="n">points</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;FIFA Points_24Feb26&#39;</span><span class="p">]</span>     <span class="c1"># FIFA points for nation i</span>
+<span class="n">conf</span>    <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Confederation&#39;</span><span class="p">]</span>           <span class="c1"># confederation for nation i</span>
+<span class="n">pot</span>     <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Pot_24Feb26&#39;</span><span class="p">]</span>             <span class="c1"># pot number for nation i</span>
+<span class="n">subset</span>  <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">))</span>             <span class="c1"># 12 subsets</span>
+
+<span class="c1"># Pot and confederation groupings</span>
+<span class="n">pot_map</span>  <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nations</span> <span class="k">if</span> <span class="n">pot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]}</span>
+
+<span class="n">confeds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="n">conf_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">conf</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">confeds</span><span class="p">}</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 7</div><div class="markdown-cell"><h2>2.2) Build Model - objective funtions / constraints</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 8</div><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConcreteModel</span><span class="p">()</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">nations</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">NonNegativeReals</span><span class="p">)</span>
+
+<span class="c1"># Objective: to maximixe W (minimum total FIFA points for each subset)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">maximize</span><span class="p">)</span>
+
+<span class="c1"># Fix each nation in Pot 1 to exactly one unique group.</span>
+<span class="n">pot1_nations</span> <span class="o">=</span> <span class="n">pot_map</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nation_code</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pot1_nations</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">nation_code</span><span class="p">,</span> <span class="n">subset</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># (1b): Minimum FIFA points</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1b</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">w</span> <span class="o">&lt;=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nations</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1b</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1b</span><span class="p">)</span>
+
+<span class="c1"># (1c): 4 nations per subset</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1c</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1c</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1c</span><span class="p">)</span>
+
+<span class="c1"># (1d): each nation in exactly one subset</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1d</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1d</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">nations</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1d</span><span class="p">)</span>
+
+<span class="c1"># (1e) A nation from any given pot per group</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1e</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">pot_num</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pot_map</span><span class="p">[</span><span class="n">pot_num</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1e</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">pot_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1e</span><span class="p">)</span>
+
+<span class="c1"># (1f) At most 1 nation from any given non-UEFA confederation per group</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1f</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">cname</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">cname</span> <span class="o">==</span> <span class="s1">&#39;UEFA&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="o">.</span><span class="n">Skip</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">conf_map</span><span class="p">[</span><span class="n">cname</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1f</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">conf_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1f</span><span class="p">)</span>
+
+<span class="c1"># (1g) At most 2 UEFA nations per subset</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_1g</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">conf_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;UEFA&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="o">&lt;=</span> <span class="mi">2</span>
+<span class="n">model</span><span class="o">.</span><span class="n">constr_1g</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_1g</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 9</div><div class="markdown-cell"><h2>2.3) Solve by Solver</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 10</div><div class="highlight"><pre><span></span><span class="n">solver</span>  <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">SolverFactory</span><span class="p">(</span><span class="s1">&#39;glpk&#39;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">load_solutions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tee</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SolverStatus</span><span class="o">.</span><span class="n">ok</span><span class="p">)</span> <span class="ow">and</span> \
+   <span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">termination_condition</span> <span class="o">==</span> <span class="n">TerminationCondition</span><span class="o">.</span><span class="n">optimal</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solve failed.&quot;</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 11</div><div class="markdown-cell"><h2>2.4) Results</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 12</div><div class="highlight"><pre><span></span><span class="c1"># 4. EXTRACT SOLUTION</span>
+<span class="n">assignment</span> <span class="o">=</span> <span class="p">{</span><span class="n">g</span><span class="p">:</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nations</span> <span class="k">if</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">}</span>
+
+<span class="n">export</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">totals</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; FIFA 2026 OPTIMAL GROUP FORMATION  |  w* = </span><span class="si">{</span><span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">w</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> pts&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">:</span>
+    <span class="n">members</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">assignment</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(</span><span class="n">pot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">-</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">total</span>   <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">members</span><span class="p">)</span>
+    <span class="n">totals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  Subset </span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;Nation&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Confederation&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Pot&#39;</span><span class="si">:</span><span class="s2">&gt;3</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;FIFA Points&#39;</span><span class="si">:</span><span class="s2">&gt;11</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">47</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">conf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">pot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;3</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;11,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">export</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;Subset&quot;</span><span class="p">:</span> <span class="n">g</span><span class="p">,</span> <span class="s2">&quot;FIFA Code&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;Confederation&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                       <span class="s2">&quot;Pot&quot;</span><span class="p">:</span> <span class="n">pot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;FIFA Points&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">)})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">47</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;TOTAL&#39;</span><span class="si">:</span><span class="s2">&gt;36</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Objective (w*) : </span><span class="si">{</span><span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">w</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Min subset pts : </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Max subset pts : </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Range          : </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Average        : </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;10,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+</pre></div>
+<div class="output"><pre>=================================================================
+ FIFA 2026 OPTIMAL GROUP FORMATION  |  w* = 6,337.03 pts
+=================================================================
+
+  Subset 1
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Spain           UEFA              1     1,877.18
+  Ecuador         CONMEBOL          2     1,591.73
+  Australia       AFC               3     1,574.01
+  Curaçao         CONCACAF          4     1,302.70
+  ───────────────────────────────────────────────
+                                 TOTAL    6,345.62
+
+  Subset 2
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Argentina       CONMEBOL          1     1,873.33
+  South Korea     AFC               2     1,599.45
+  Scotland        UEFA              3     1,506.77
+  Cabo Verde      CAF               4     1,370.49
+  ───────────────────────────────────────────────
+                                 TOTAL    6,350.04
+
+  Subset 3
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  France          UEFA              1     1,870.00
+  Japan           AFC               2     1,650.12
+  Paraguay        CONMEBOL          3     1,501.50
+  Ghana           CAF               4     1,351.09
+  ───────────────────────────────────────────────
+                                 TOTAL    6,372.71
+
+  Subset 4
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  England         UEFA              1     1,834.12
+  Colombia        CONMEBOL          2     1,701.30
+  Egypt           CAF               3     1,556.71
+  New Zealand     OFC               4     1,279.25
+  ───────────────────────────────────────────────
+                                 TOTAL    6,371.38
+
+  Subset 5
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Brazil          CONMEBOL          1     1,760.46
+  Senegal         CAF               2     1,706.83
+  Turkey          UEFA              3     1,582.69
+  Haiti           CONCACAF          4     1,294.49
+  ───────────────────────────────────────────────
+                                 TOTAL    6,344.47
+
+  Subset 6
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Portugal        UEFA              1     1,760.38
+  Italy           UEFA              2     1,702.06
+  Tunisia         CAF               3     1,479.04
+  Saudi Arabia    AFC               4     1,429.48
+  ───────────────────────────────────────────────
+                                 TOTAL    6,370.96
+
+  Subset 7
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Netherlands     UEFA              1     1,756.27
+  IR Iran         AFC               2     1,617.02
+  Panama          CONCACAF          3     1,539.47
+  South Africa    CAF               4     1,432.76
+  ───────────────────────────────────────────────
+                                 TOTAL    6,345.52
+
+  Subset 8
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Morocco         CAF               1     1,736.57
+  Denmark         UEFA              2     1,616.75
+  Norway          UEFA              3     1,553.14
+  Qatar           AFC               4     1,454.96
+  ───────────────────────────────────────────────
+                                 TOTAL    6,361.42
+
+  Subset 9
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Belgium         UEFA              1     1,730.71
+  Croatia         UEFA              2     1,716.88
+  Côte d&#x27;Ivoire   CAF               3     1,522.48
+  Jordan          AFC               4     1,388.93
+  ───────────────────────────────────────────────
+                                 TOTAL    6,359.00
+
+  Subset 10
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  United States   CONCACAF          1     1,681.88
+  Uruguay         CONMEBOL          2     1,672.62
+  Ukraine         UEFA              3     1,557.47
+  Iraq            AFC               4     1,436.94
+  ───────────────────────────────────────────────
+                                 TOTAL    6,348.91
+
+  Subset 11
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Mexico          CONCACAF          1     1,675.75
+  Switzerland     UEFA              2     1,654.69
+  Algeria         CAF               3     1,560.91
+  Uzbekistan      AFC               4     1,462.03
+  ───────────────────────────────────────────────
+                                 TOTAL    6,353.38
+
+  Subset 12
+  Nation          Confederation   Pot  FIFA Points
+  -----------------------------------------------
+  Canada          CONCACAF          1     1,559.15
+  Germany         UEFA              2     1,724.15
+  Austria         UEFA              3     1,585.51
+  DR Congo        CAF               4     1,468.22
+  ───────────────────────────────────────────────
+                                 TOTAL    6,337.03
+
+=================================================================
+  Objective (w*) :   6,337.03
+  Min subset pts :   6,337.03
+  Max subset pts :   6,372.71
+  Range          :      35.68
+  Average        :   6,355.04
+=================================================================
+</pre></div></div><div class="cell"><div class="cell-header">Markdown cell 13</div><div class="markdown-cell"><h1>Question 3</h1>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 14</div><div class="highlight"><pre><span></span><span class="c1"># MODEL 2 – GROUP-LETTER ASSIGNMENT MODEL</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 15</div><div class="highlight"><pre><span></span><span class="c1"># &#39;groups&#39; is built to automatically retrieve Model 1&#39;s solution</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="n">assignment</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 16</div><div class="markdown-cell"><h2>3.1) Load data</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 17</div><div class="highlight"><pre><span></span><span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Stadium Data&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">df3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Match_schedule&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">spectator_index</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;Spectator Index&#39;</span><span class="p">]</span>
+<span class="n">row</span>             <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">17</span><span class="p">))</span>                                    <span class="c1"># row-set index</span>
+<span class="n">n_matches</span>       <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;No. of matches assigned (Group Stage)&#39;</span><span class="p">]</span>   <span class="c1"># match number allocated to each stadium</span>
+<span class="n">letter</span>          <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;ABCDEFGHIJKL&quot;</span><span class="p">)</span>                                 <span class="c1"># group letter index</span>
+
+<span class="n">fi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Spectator Index&#39;</span><span class="p">]))</span>                        <span class="c1"># read spectator index</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 18</div><div class="highlight"><pre><span></span><span class="c1"># Rank nations within each subset</span>
+<span class="c1"># Rank 1 = host nation (leads its subset by convention); others by descending FIFA points.</span>
+<span class="n">hosts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Mexico&quot;</span><span class="p">,</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="s2">&quot;United States&quot;</span><span class="p">]</span>
+<span class="n">ranked_groups</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">:</span>
+    <span class="n">teams</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+    <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">teams</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hosts</span><span class="p">,</span> <span class="o">-</span><span class="n">points</span><span class="p">[</span><span class="n">t</span><span class="p">]))</span>
+    <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="n">ranked</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 19</div><div class="highlight"><pre><span></span><span class="c1"># define match set for each subset g</span>
+<span class="n">Mg</span> <span class="o">=</span> <span class="p">{}</span> 
+<span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">team_list</span> <span class="ow">in</span> <span class="n">ranked_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>   
+    <span class="n">Mg</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">team_list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">team_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i2</span> <span class="o">=</span> <span class="n">team_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">Mg</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">))</span>
+
+<span class="c1"># Match popularity π_{g,(i1,i2)} </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">match_popularity</span><span class="p">(</span><span class="n">fi1</span><span class="p">,</span> <span class="n">fi2</span><span class="p">):</span> 
+    <span class="n">spectators_i1</span> <span class="o">=</span> <span class="n">fi1</span>
+    <span class="n">spectators_i2</span> <span class="o">=</span> <span class="n">fi2</span>
+    <span class="n">spectators_other</span> <span class="o">=</span> <span class="p">(</span><span class="n">fi1</span> <span class="o">+</span> <span class="n">fi2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">officials</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">fi1</span><span class="p">,</span> <span class="n">fi2</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="p">(</span><span class="n">fi1</span> <span class="o">+</span> <span class="n">fi2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">spectators_i1</span> <span class="o">+</span> <span class="n">spectators_i2</span> <span class="o">+</span> <span class="n">spectators_other</span> <span class="o">+</span> <span class="n">officials</span>
+
+<span class="c1"># define π_g(i1,i2)</span>
+<span class="n">pi</span> <span class="o">=</span> <span class="p">{}</span>  
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">Mg</span><span class="p">:</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Mg</span><span class="p">[</span><span class="n">g</span><span class="p">]:</span>
+        <span class="n">fi1</span> <span class="o">=</span> <span class="n">fi</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+        <span class="n">fi2</span> <span class="o">=</span> <span class="n">fi</span><span class="p">[</span><span class="n">i2</span><span class="p">]</span>
+        <span class="n">pi</span><span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">match_popularity</span><span class="p">(</span><span class="n">fi1</span><span class="p">,</span> <span class="n">fi2</span><span class="p">)</span>
+
+<span class="c1"># Row-set structure J_r</span>
+<span class="c1"># J[r] = list of (group_letter, rank_team1, rank_team2) for each match in row-set r</span>
+<span class="n">df3</span> <span class="o">=</span> <span class="n">df3</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">stadium</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df3</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Stadium&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">J</span><span class="p">[</span><span class="n">stadium</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;Group Letter&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;team1&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;team2&#39;</span><span class="p">]))</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 20</div><div class="markdown-cell"><h2>3.2) Build Model - objective funtions / constraints</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 21</div><div class="highlight"><pre><span></span><span class="n">model2</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConcreteModel</span><span class="p">()</span>
+
+<span class="n">model2</span><span class="o">.</span><span class="n">z</span>    <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">letter</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>           <span class="c1"># z_{g,l}</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">y</span>    <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">NonNegativeReals</span><span class="p">)</span>            <span class="c1"># y_r</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">NonNegativeReals</span><span class="p">)</span>                 <span class="c1"># w^min</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">wmax</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">NonNegativeReals</span><span class="p">)</span>                 <span class="c1"># w^max</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">v</span>    <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>                      <span class="c1"># v_r</span>
+
+<span class="c1"># Objective: maximise w^min + w^max (minimum row-set popularity + maximum row-set popularuty)</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">model2</span><span class="o">.</span><span class="n">wmin</span> <span class="o">+</span> <span class="n">model2</span><span class="o">.</span><span class="n">wmax</span><span class="p">,</span> <span class="n">sense</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">maximize</span><span class="p">)</span>
+
+<span class="c1"># (2b): To set lowerbound for row-set popularity (w^min &lt;= y_r   for all r)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2b</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model2</span><span class="o">.</span><span class="n">wmin</span> <span class="o">&lt;=</span> <span class="n">model2</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2b</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2b</span><span class="p">)</span>
+
+<span class="c1"># (2c): To set Upperbound for row-set popularity (w^max &gt;= y_r   for all r)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2c</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model2</span><span class="o">.</span><span class="n">wmax</span> <span class="o">&gt;=</span> <span class="n">model2</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2c</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2c</span><span class="p">)</span>
+
+<span class="c1"># (2d): w^max &lt;= y_r + M_r*(1 - v_r)   for all r</span>
+<span class="c1"># M_r = 4 * n_matches[r]  (modified from paper; paper uses 16 for 4-match row-sets)</span>
+<span class="c1"># the M_r is equivalent to a big-M which prevents wmax from being unbounded</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2d</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model2</span><span class="o">.</span><span class="n">wmax</span> <span class="o">&lt;=</span> <span class="n">model2</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n_matches</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">model2</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2d</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2d</span><span class="p">)</span>
+
+<span class="c1"># (2e): sum_{r} v_r = 1</span>
+<span class="c1"># make sure that one row-set popularity exactly equals to the maximum row-set popularity(wmax)</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2e</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># (2f): row-set popularity computation (y_r = sum_{(l,q1,q2) in J_r} sum_{g} pop[g][(q1,q2)] * z[g,l]   for all r)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2f</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">total_popularity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">J</span><span class="p">[</span><span class="n">r</span><span class="p">]:</span>
+        <span class="n">total_popularity</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pi</span><span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">q1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">q2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])]</span> <span class="o">*</span> <span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g</span><span class="p">,</span><span class="n">l</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model2</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">==</span> <span class="n">total_popularity</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2f</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2f</span><span class="p">)</span>
+
+<span class="c1"># (2g): each letter assigned to exactly one subset (sum_{g} z[g,l] = 1   for all l) </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2g</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2g</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">letter</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2g</span><span class="p">)</span>
+
+<span class="c1"># (2h): each subset assigned to exactly one letter (sum_{l} z[g,l] = 1   for all g) </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_2h</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">letter</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2h</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_2h</span><span class="p">)</span>
+
+<span class="c1"># (2i): fix host-nation subsets to their designated letters</span>
+<span class="n">g_mex</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">g_can</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">g_us</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">teams_in_g</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="s1">&#39;Mexico&#39;</span> <span class="ow">in</span> <span class="n">teams_in_g</span><span class="p">:</span>
+        <span class="n">g_mex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;Canada&#39;</span> <span class="ow">in</span> <span class="n">teams_in_g</span><span class="p">:</span>
+        <span class="n">g_can</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;United States&#39;</span> <span class="ow">in</span> <span class="n">teams_in_g</span><span class="p">:</span>
+        <span class="n">g_us</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2ia</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g_mex</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2ib</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g_can</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">model2</span><span class="o">.</span><span class="n">constr_2ic</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g_us</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 22</div><div class="markdown-cell"><h2>3.3) Solve by Solver</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 23</div><div class="highlight"><pre><span></span><span class="n">solver2</span>  <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">SolverFactory</span><span class="p">(</span><span class="s1">&#39;glpk&#39;</span><span class="p">)</span>
+<span class="n">results2</span> <span class="o">=</span> <span class="n">solver2</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">load_solutions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tee</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SolverStatus</span><span class="o">.</span><span class="n">ok</span><span class="p">)</span> <span class="ow">and</span> \
+   <span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">termination_condition</span> <span class="o">==</span> <span class="n">TerminationCondition</span><span class="o">.</span><span class="n">optimal</span><span class="p">):</span>
+    <span class="n">model2</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="n">results2</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solve failed.&quot;</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 24</div><div class="markdown-cell"><h2>3.4) Results</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 25</div><div class="highlight"><pre><span></span><span class="c1"># Extract solution</span>
+<span class="n">zv</span>    <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">letter</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;Float64&#39;</span><span class="p">)</span>
+<span class="n">yv</span>    <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;Float64&#39;</span><span class="p">)</span>
+<span class="n">wminv</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">wmin</span><span class="p">)</span>
+<span class="n">wmaxv</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">wmax</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">letter</span><span class="p">:</span>
+        <span class="n">zv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="n">l</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+    <span class="n">yv</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+
+<span class="n">oval2</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model2</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objective:&quot;</span><span class="p">,</span> <span class="n">oval2</span><span class="p">)</span>
+
+<span class="n">subset_to_letter</span> <span class="o">=</span> <span class="p">{</span><span class="n">g</span><span class="p">:</span> <span class="n">l</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">letter</span> <span class="k">if</span> <span class="n">zv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">}</span>
+<span class="n">letter_to_subset</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">subset_to_letter</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="c1"># RESULTS</span>
+<span class="c1"># Result1: Group Letter Assignment</span>
+<span class="n">result_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span>
+    <span class="s1">&#39;Group Letter&#39;</span><span class="p">:</span> <span class="n">subset_to_letter</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+    <span class="s1">&#39;Subset&#39;</span><span class="p">:</span>       <span class="n">g</span><span class="p">,</span>
+    <span class="s1">&#39;Rank1&#39;</span><span class="p">:</span>        <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+    <span class="s1">&#39;Rank2&#39;</span><span class="p">:</span>        <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s1">&#39;Rank3&#39;</span><span class="p">:</span>        <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+    <span class="s1">&#39;Rank4&#39;</span><span class="p">:</span>        <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+<span class="p">}</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Group Letter&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; GROUP-LETTER ASSIGNMENT  |  Objective = </span><span class="si">{</span><span class="n">oval2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; w^min = </span><span class="si">{</span><span class="n">wminv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">   |   w^max = </span><span class="si">{</span><span class="n">wmaxv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Group Letter&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Subset&#39;</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Rank1&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Rank2&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Rank3&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Rank4&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">80</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result_1</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Group Letter&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Subset&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank1&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank2&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank3&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank4&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Result2: Match Popularity</span>
+<span class="n">result_2_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">J</span><span class="p">[</span><span class="n">r</span><span class="p">]:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">letter_to_subset</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">nation1</span> <span class="o">=</span> <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">q1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">nation2</span> <span class="o">=</span> <span class="n">ranked_groups</span><span class="p">[</span><span class="n">g</span><span class="p">][</span><span class="n">q2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">result_2_rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Row-set&#39;</span><span class="p">:</span>            <span class="n">r</span><span class="p">,</span>
+            <span class="s1">&#39;Row-set Popularity&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;Group Letter&#39;</span><span class="p">:</span>       <span class="n">l</span><span class="p">,</span>
+            <span class="s1">&#39;Subset&#39;</span><span class="p">:</span>             <span class="n">g</span><span class="p">,</span>
+            <span class="s1">&#39;Rank q1&#39;</span><span class="p">:</span>            <span class="n">q1</span><span class="p">,</span>
+            <span class="s1">&#39;Nation 1&#39;</span><span class="p">:</span>           <span class="n">nation1</span><span class="p">,</span>
+            <span class="s1">&#39;Rank q2&#39;</span><span class="p">:</span>            <span class="n">q2</span><span class="p">,</span>
+            <span class="s1">&#39;Nation 2&#39;</span><span class="p">:</span>           <span class="n">nation2</span><span class="p">,</span>
+            <span class="s1">&#39;Match Popularity&#39;</span><span class="p">:</span>   <span class="nb">round</span><span class="p">(</span><span class="n">pi</span><span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="n">nation1</span><span class="p">,</span> <span class="n">nation2</span><span class="p">)],</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="p">})</span>
+<span class="n">result_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">result_2_rows</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Row-set&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;y_r&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Letter&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Rk1&#39;</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Nation1&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> &quot;</span>
+      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Rk2&#39;</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Nation2&#39;</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Popularity&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">85</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result_2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Row-set&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Row-set Popularity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}</span><span class="s2"> &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Group Letter&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank q1&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Nation 1&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Rank q2&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Nation 2&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Match Popularity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;12.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Result3: Row-set Popularity Summary</span>
+<span class="n">result_3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span>
+    <span class="s1">&#39;Row-set&#39;</span><span class="p">:</span>            <span class="n">r</span><span class="p">,</span>
+    <span class="s1">&#39;Number of Matches&#39;</span><span class="p">:</span>  <span class="n">n_matches</span><span class="p">[</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s1">&#39;Row-set Popularity&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Row-set&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;# Matches&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Row-set Popularity&#39;</span><span class="si">:</span><span class="s2">&gt;20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">44</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result_3</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Row-set&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Number of Matches&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2"> &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Row-set Popularity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;20.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">44</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;w^min&#39;</span><span class="si">:</span><span class="s2">&gt;32</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">wminv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;w^max&#39;</span><span class="si">:</span><span class="s2">&gt;32</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">wmaxv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;Objective (w^min+w^max)&#39;</span><span class="si">:</span><span class="s2">&gt;32</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">oval2</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+<div class="output"><pre>Objective: 30.072243836434602
+
+============================================================
+ GROUP-LETTER ASSIGNMENT  |  Objective = 30.0722
+ w^min = 10.0722   |   w^max = 20.0000
+============================================================
+
+  Group Letter   Subset   Rank1          Rank2          Rank3          Rank4
+  ────────────────────────────────────────────────────────────────────────────────
+  A              11       Mexico         Switzerland    Algeria        Uzbekistan
+  B              12       Canada         Germany        Austria        DR Congo
+  C              4        England        Colombia       Egypt          New Zealand
+  D              10       United States  Uruguay        Ukraine        Iraq
+  E              8        Morocco        Denmark        Norway         Qatar
+  F              7        Netherlands    IR Iran        Panama         South Africa
+  G              5        Brazil         Senegal        Turkey         Haiti
+  H              6        Portugal       Italy          Tunisia        Saudi Arabia
+  I              3        France         Japan          Paraguay       Ghana
+  J              9        Belgium        Croatia        Côte d&#x27;Ivoire  Jordan
+  K              1        Spain          Ecuador        Australia      Curaçao
+  L              2        Argentina      South Korea    Scotland       Cabo Verde
+
+   Row-set        y_r   Letter   Rk1 Nation1          Rk2 Nation2          Popularity
+  ─────────────────────────────────────────────────────────────────────────────────────
+         1    17.5774        C     1 England            2 Colombia             4.0000
+         1    17.5774        I     1 France             2 Japan                4.0000
+         1    17.5774        I     2 Japan              4 Ghana                2.5225
+         1    17.5774        E     1 Morocco            4 Qatar                3.0549
+         1    17.5774        L     1 Argentina          4 Cabo Verde           4.0000
+         2    15.0937        F     1 Netherlands        2 IR Iran              3.5284
+         2    15.0937        L     1 Argentina          2 South Korea          4.0000
+         2    15.0937        J     1 Belgium            3 Côte d&#x27;Ivoire        2.5215
+         2    15.0937        F     2 IR Iran            3 Panama               2.4961
+         2    15.0937        J     1 Belgium            4 Jordan               2.5476
+         3    13.1339        J     1 Belgium            2 Croatia              4.0000
+         3    13.1339        E     2 Denmark            4 Qatar                2.6124
+         3    13.1339        F     1 Netherlands        4 South Africa         4.0000
+         3    13.1339        J     2 Croatia            3 Côte d&#x27;Ivoire        2.5215
+         4    17.6029        E     1 Morocco            2 Denmark              3.9044
+         4    17.6029        K     1 Spain              2 Ecuador              3.7327
+         4    17.6029        F     1 Netherlands        3 Panama               3.3437
+         4    17.6029        K     1 Spain              3 Australia            4.0000
+         4    17.6029        H     2 Italy              3 Tunisia              2.6221
+         5    17.0727        H     1 Portugal           2 Italy                3.8896
+         5    17.0727        A     2 Switzerland        4 Uzbekistan           3.1147
+         5    17.0727        H     1 Portugal           3 Tunisia              3.0770
+         5    17.0727        C     2 Colombia           3 Egypt                3.2587
+         5    17.0727        K     2 Ecuador            3 Australia            3.7327
+         6    14.9148        D     1 United States      2 Uruguay              4.0000
+         6    14.9148        G     3 Turkey             4 Haiti                1.4596
+         6    14.9148        B     2 Germany            4 DR Congo             2.6772
+         6    14.9148        G     1 Brazil             3 Turkey               3.5296
+         6    14.9148        D     1 United States      4 Iraq                 3.2485
+         7    14.4678        G     1 Brazil             2 Senegal              4.0000
+         7    14.4678        D     1 United States      3 Ukraine              2.9382
+         7    14.4678        B     2 Germany            3 Austria              4.0000
+         7    14.4678        G     2 Senegal            3 Turkey               3.5296
+         8    11.5037        B     3 Austria            4 DR Congo             2.6772
+         8    11.5037        J     3 Côte d&#x27;Ivoire      4 Jordan               0.0922
+         8    11.5037        D     2 Uruguay            4 Iraq                 3.2485
+         8    11.5037        J     2 Croatia            4 Jordan               2.5476
+         8    11.5037        D     2 Uruguay            3 Ukraine              2.9382
+         9    18.2180        E     3 Norway             4 Qatar                3.0549
+         9    18.2180        C     1 England            3 Egypt                3.2587
+         9    18.2180        I     1 France             3 Paraguay             4.0000
+         9    18.2180        E     2 Denmark            3 Norway               3.9044
+         9    18.2180        L     2 South Korea        3 Scotland             4.0000
+        10    10.4671        H     3 Tunisia            4 Saudi Arabia         1.1883
+        10    10.4671        H     2 Italy              4 Saudi Arabia         2.2718
+        10    10.4671        C     1 England            4 New Zealand          3.8403
+        10    10.4671        K     1 Spain              4 Curaçao              3.1667
+        11    15.6839        C     3 Egypt              4 New Zealand          2.7986
+        11    15.6839        I     3 Paraguay           4 Ghana                2.5225
+        11    15.6839        C     2 Colombia           4 New Zealand          3.8403
+        11    15.6839        L     1 Argentina          3 Scotland             4.0000
+        11    15.6839        I     1 France             4 Ghana                2.5225
+        12    13.3897        D     3 Ukraine            4 Iraq                 1.5823
+        12    13.3897        B     1 Canada             3 Austria              4.0000
+        12    13.3897        G     2 Senegal            4 Haiti                2.5651
+        12    13.3897        B     1 Canada             4 DR Congo             2.6772
+        12    13.3897        G     1 Brazil             4 Haiti                2.5651
+        13    20.0000        B     1 Canada             2 Germany              4.0000
+        13    20.0000        L     3 Scotland           4 Cabo Verde           4.0000
+        13    20.0000        E     1 Morocco            3 Norway               4.0000
+        13    20.0000        L     2 South Korea        4 Cabo Verde           4.0000
+        13    20.0000        I     2 Japan              3 Paraguay             4.0000
+        14    10.2814        A     1 Mexico             2 Switzerland          4.0000
+        14    10.2814        K     3 Australia          4 Curaçao              3.1667
+        14    10.2814        A     1 Mexico             4 Uzbekistan           3.1147
+        15    10.0722        F     3 Panama             4 South Africa         3.3437
+        15    10.0722        F     2 IR Iran            4 South Africa         3.5284
+        15    10.0722        A     2 Switzerland        3 Algeria              3.2001
+        16    10.3001        A     3 Algeria            4 Uzbekistan           1.7531
+        16    10.3001        A     1 Mexico             3 Algeria              3.2001
+        16    10.3001        K     2 Ecuador            4 Curaçao              2.5326
+        16    10.3001        H     1 Portugal           4 Saudi Arabia         2.8142
+
+   Row-set    # Matches   Row-set Popularity
+  ────────────────────────────────────────────
+       1.0          5.0              17.5774
+       2.0          5.0              15.0937
+       3.0          4.0              13.1339
+       4.0          5.0              17.6029
+       5.0          5.0              17.0727
+       6.0          5.0              14.9148
+       7.0          4.0              14.4678
+       8.0          5.0              11.5037
+       9.0          5.0              18.2180
+      10.0          4.0              10.4671
+      11.0          5.0              15.6839
+      12.0          5.0              13.3897
+      13.0          5.0              20.0000
+      14.0          3.0              10.2814
+      15.0          3.0              10.0722
+      16.0          4.0              10.3001
+  ────────────────────────────────────────────
+                             w^min  10.0722
+                             w^max  20.0000
+           Objective (w^min+w^max)  30.0722
+</pre></div><div class="output"><pre>C:\Users\pun\AppData\Local\Temp\ipykernel_38144\2898708071.py:72: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`
+  &#x27;Number of Matches&#x27;:  n_matches[r-1],
+</pre></div></div><div class="cell"><div class="cell-header">Markdown cell 26</div><div class="markdown-cell"><h1>Question 4</h1>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 27</div><div class="highlight"><pre><span></span><span class="c1"># MODEL 3 – STADIUM ASSIGNMENT MODEL</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 28</div><div class="markdown-cell"><h2>4.1) Load data</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 29</div><div class="highlight"><pre><span></span><span class="c1"># Load stadium data (tab: &#39;Stadium Data&#39;)</span>
+<span class="n">df_stad3</span>     <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Stadium Data&#39;</span><span class="p">,</span>
+                              <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Stadium&#39;</span><span class="p">,</span> <span class="s1">&#39;Capacity&#39;</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;No. of matches assigned (Group Stage)&#39;</span><span class="p">])</span>
+<span class="n">stadiums</span>     <span class="o">=</span> <span class="n">df_stad3</span><span class="p">[</span><span class="s1">&#39;Stadium&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">capacity</span>     <span class="o">=</span> <span class="n">df_stad3</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Stadium&#39;</span><span class="p">)[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>                               <span class="c1"># κ_s: stadium capacity</span>
+<span class="n">country</span>      <span class="o">=</span> <span class="n">df_stad3</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Stadium&#39;</span><span class="p">)[</span><span class="s1">&#39;Country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>                                <span class="c1"># country of stadium s</span>
+<span class="n">stad_matches</span> <span class="o">=</span> <span class="n">df_stad3</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Stadium&#39;</span><span class="p">)[</span><span class="s1">&#39;No. of matches assigned (Group Stage)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>  <span class="c1"># number of matches assigned to each stadium</span>
+</pre></div>
+</div><div class="cell code-cell"><div class="cell-header">Code cell 30</div><div class="highlight"><pre><span></span><span class="c1"># Identify row-sets with host-nation matches and their required country</span>
+<span class="c1"># To identify which row-sets contain 3 host nations : MEX (Group A, Rank 1) -&gt; Mexico; CAN (Group B, Rank 1) -&gt; Canada; USA (Group D, Rank 1)</span>
+<span class="n">host_requirements</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="s1">&#39;Mexico&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="s1">&#39;Canada&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="s1">&#39;United States&#39;</span><span class="p">}</span>
+
+<span class="n">rowset_required_country</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">J</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">grp_letter</span><span class="p">,</span> <span class="n">hostcountry</span> <span class="ow">in</span> <span class="n">host_requirements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">l</span> <span class="o">==</span> <span class="n">grp_letter</span> <span class="ow">and</span> <span class="p">(</span><span class="n">q1</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">q2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">J</span><span class="p">[</span><span class="n">r</span><span class="p">]):</span>
+            <span class="n">rowset_required_country</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">hostcountry</span>
+            <span class="k">break</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 31</div><div class="markdown-cell"><h2>4.2) Build Model - objective funtions / constraints</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 32</div><div class="highlight"><pre><span></span><span class="n">model3</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConcreteModel</span><span class="p">()</span>
+
+<span class="n">model3</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">stadiums</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>   <span class="c1"># u[r,s] = 1 iff row-set r -&gt; stadium s</span>
+
+<span class="c1"># Objective: maximise sum_{r,s} κ_s * ȳ_r * u[r,s]</span>
+<span class="n">model3</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">capacity</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">*</span> <span class="n">yv</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stadiums</span><span class="p">),</span> <span class="n">sense</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">maximize</span><span class="p">)</span>
+
+<span class="c1"># (3a): each row-set assigned to exactly one stadium</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_3a</span><span class="p">(</span><span class="n">model3</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stadiums</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model3</span><span class="o">.</span><span class="n">constr_3a</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_3a</span><span class="p">)</span>
+
+<span class="c1"># (3b): each stadium assigned to exactly one row-set</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rule_3b</span><span class="p">(</span><span class="n">model3</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">model3</span><span class="o">.</span><span class="n">constr_3b</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">stadiums</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">rule_3b</span><span class="p">)</span>
+
+<span class="c1"># (3c): host-nation country constraints</span>
+<span class="c1"># For every restricted row-set r, fix u[r,s] = 0 for stadiums outside the required country.</span>
+<span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">req_country</span> <span class="ow">in</span> <span class="n">rowset_required_country</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stadiums</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">country</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">!=</span> <span class="n">req_country</span><span class="p">:</span>
+            <span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># (3d): match-count parity</span>
+<span class="c1"># Row-set r may only be assigned to stadium s if both have the same number of matches.</span>
+<span class="c1"># Fix u[r,s] = 0 for all (r,s) pairs where n_matches[r] != stad_matches[s].</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stadiums</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n_matches</span><span class="p">[</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">stad_matches</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span>
+            <span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+<div class="output"><pre>C:\Users\pun\AppData\Local\Temp\ipykernel_38144\1859117619.py:30: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`
+  if n_matches[r-1] != stad_matches[s]:
+</pre></div></div><div class="cell"><div class="cell-header">Markdown cell 33</div><div class="markdown-cell"><h2>4.3) Solve by Solver</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 34</div><div class="highlight"><pre><span></span><span class="n">solver3</span>  <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">SolverFactory</span><span class="p">(</span><span class="s1">&#39;glpk&#39;</span><span class="p">)</span>
+<span class="n">results3</span> <span class="o">=</span> <span class="n">solver3</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model3</span><span class="p">,</span> <span class="n">load_solutions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tee</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SolverStatus</span><span class="o">.</span><span class="n">ok</span><span class="p">)</span> <span class="ow">and</span> \
+   <span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">termination_condition</span> <span class="o">==</span> <span class="n">TerminationCondition</span><span class="o">.</span><span class="n">optimal</span><span class="p">):</span>
+    <span class="n">model3</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="n">results3</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solve failed.&quot;</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div><div class="cell"><div class="cell-header">Markdown cell 35</div><div class="markdown-cell"><h2>4.4) Results</h2>
+</div></div><div class="cell code-cell"><div class="cell-header">Code cell 36</div><div class="highlight"><pre><span></span><span class="c1"># Extract solution</span>
+<span class="n">oval3</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model3</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objective:&quot;</span><span class="p">,</span> <span class="n">oval3</span><span class="p">)</span>
+
+<span class="n">rowset_to_stadium</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">:</span> <span class="n">s</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stadiums</span>
+                     <span class="k">if</span> <span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model3</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; STADIUM ASSIGNMENT  |  Objective = </span><span class="si">{</span><span class="n">oval3</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Row-set&#39;</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Stadium&#39;</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Country&#39;</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Capacity&#39;</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">&#39;Popularity&#39;</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="s1">&#39;─&#39;</span><span class="o">*</span><span class="mi">90</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">rowset_to_stadium</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">r</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">s</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">country</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">capacity</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;10,</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">yv</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;12.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+<div class="output"><pre>Objective: 14661342.423301434
+
+======================================================================
+ STADIUM ASSIGNMENT  |  Objective = 14,661,342.42
+======================================================================
+
+   Row-set  Stadium                              Country            Capacity    Popularity
+  ──────────────────────────────────────────────────────────────────────────────────────────
+         1  Los Angeles Stadium                  United States        69,650       17.5774
+         2  Atlanta Stadium                      United States        67,382       15.0937
+         3  Seattle Stadium                      United States        65,123       13.1339
+         4  Dallas Stadium                       United States        70,122       17.6029
+         5  San Francisco Bay Area Stadium       United States        69,391       17.0727
+         6  Philadelphia Stadium                 United States        65,827       14.9148
+         7  Kansas City Stadium                  United States        67,513       14.4678
+         8  Boston Stadium                       United States        63,815       11.5037
+         9  New York New Jersey Stadium          United States        78,576       18.2180
+        10  Miami Stadium                        United States        64,091       10.4671
+        11  Houston Stadium                      United States        68,311       15.6839
+        12  Toronto Stadium                      Canada               44,315       13.3897
+        13  BC Place Vancouver                   Canada               48,821       20.0000
+        14  Mexico City Stadium                  Mexico               72,766       10.2814
+        15  Monterrey Stadium                    Mexico               50,113       10.0722
+        16  Guadalajara Stadium                  Mexico               44,330       10.3001
+</pre></div></div><div class="cell code-cell"><div class="cell-header">Code cell 37</div><div class="highlight"><pre><span></span>
+</pre></div>
+</div></div></body></html>
